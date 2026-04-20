@@ -1,0 +1,40 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.chartsRow {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: var(--space-6);
+}
+
+.chartMain {
+  min-width: 0;
+}
+
+.chartSide {
+  min-width: 0;
+}
+
+.bottomRow {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: var(--space-6);
+}
+
+.transactionsCol {
+  min-width: 0;
+}
+
+.alertsCol {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .chartsRow,
+  .bottomRow {
+    grid-template-columns: 1fr;
+  }
+}

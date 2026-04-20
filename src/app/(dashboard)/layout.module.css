@@ -1,0 +1,29 @@
+.layoutWrapper {
+  display: flex;
+  min-height: 100dvh;
+}
+
+.mainArea {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.content {
+  flex: 1;
+  padding: var(--space-8);
+  max-width: var(--max-content-width);
+  width: 100%;
+  animation: fadeIn var(--duration-normal) var(--ease-out);
+}
+
+@media (max-width: 768px) {
+  .mainArea {
+    margin-left: 0;
+  }
+  .content {
+    padding: var(--space-4);
+  }
+}

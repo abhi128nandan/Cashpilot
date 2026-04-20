@@ -1,0 +1,231 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.overview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  animation: fadeInUp var(--duration-normal) var(--ease-out);
+}
+
+.overviewCard {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.overviewLabel {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+}
+
+.overviewValue {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.overviewValueGreen {
+  composes: overviewValue;
+  color: var(--color-accent-400);
+}
+
+/* Budget Cards Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-5);
+}
+
+.card {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) var(--space-6);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.card:hover {
+  border-color: var(--color-border-default);
+  box-shadow: var(--shadow-md);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.catInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.catIcon {
+  font-size: var(--text-lg);
+}
+
+.catName {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.periodBadge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-tertiary);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.amounts {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.spent {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.limit {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+
+.progressTrack {
+  height: 6px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.8s var(--ease-out);
+}
+
+.fillGood {
+  background: var(--color-accent-400);
+}
+
+.fillWarning {
+  background: var(--color-warning-400);
+}
+
+.fillDanger {
+  background: var(--color-danger-400);
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.remaining {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.pctBadge {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.pctGood {
+  background: hsla(160, 78%, 42%, 0.12);
+  color: var(--color-accent-400);
+}
+
+.pctWarning {
+  background: hsla(38, 92%, 50%, 0.12);
+  color: var(--color-warning-400);
+}
+
+.pctDanger {
+  background: hsla(0, 78%, 54%, 0.12);
+  color: var(--color-danger-400);
+}
+
+/* Add Budget Card */
+.addCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 2px dashed var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  transition: all var(--duration-fast) var(--ease-out);
+  min-height: 180px;
+}
+
+.addCard:hover {
+  border-color: var(--color-primary-400);
+  background: hsla(225, 82%, 52%, 0.04);
+}
+
+.addIcon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xl);
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.addCard:hover .addIcon {
+  background: hsla(225, 82%, 52%, 0.1);
+  color: var(--color-primary-400);
+}
+
+.addLabel {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 1024px) {
+  .overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
