@@ -18,7 +18,7 @@ Full-stack finance tracking app built with Next.js, Supabase, and TypeScript.
 * Next.js
 * Supabase
 * TypeScript
-* Tailwind CSS (if using)
+* Tailwind CSS 
 
 ---
 
