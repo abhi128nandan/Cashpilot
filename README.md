@@ -1,35 +1,42 @@
 # CashPilot
 
-CashPilot is a full-stack personal finance management platform built with Next.js, TypeScript, and Supabase. It helps users track income and expenses, visualize spending patterns, monitor financial health, and manage personal finances through an intuitive dashboard experience.
+A modern full-stack platform for taking control of your personal finances.
+
+## Overview
+
+CashPilot is a comprehensive financial application that provides an intuitive dashboard experience for monitoring financial health. It empowers users to search, filter, and categorize daily expenses, visualize spending patterns, track budgets, and gain insights into their income vs. expense flow.
 
 ## Features
 
 ### Financial Management
+
 * Expense tracking
 * Transaction history
 * Categorization
-* Financial overview
+* Budget tracking
 
 ### Analytics
+
 * Spending breakdowns
 * Income vs expense visualization
-* Dashboard metrics
+* Financial metrics
 
 ### User Experience
+
 * Authentication
 * Responsive design
 * Search and filtering
 
-## Technical Highlights
-* Next.js App Router architecture
-* TypeScript type safety
-* Supabase Authentication
-* PostgreSQL data persistence
-* Dashboard analytics visualizations
-* Component-driven UI architecture
-* Responsive design system
+## Tech Stack
 
-## System Architecture
+* **Framework**: Next.js (App Router)
+* **Language**: TypeScript
+* **Database & Auth**: Supabase (PostgreSQL)
+* **Styling**: Tailwind CSS
+* **Validation**: Zod
+* **AI Integration**: Vercel AI SDK
+
+## Architecture
 
 ```text
 User
@@ -52,47 +59,47 @@ Supabase
 CashPilot Data Layer
 ```
 
-## Database Architecture
-
-```text
-Profiles (Users)
-│
-├── Transactions
-├── Categories
-├── Budgets
-└── Anomalies
-
-Transactions
-│
-├── Amount
-├── Type
-├── Date
-└── Category
-```
-
-## Challenges Solved
-* Secure authentication flow
-* Transaction state management
-* Financial dashboard aggregation
-* Responsive dashboard layouts
-* Data visualization integration
-
 ## Screenshots
 
 ### Authentication
-Secure user authentication powered by Supabase.
 
-![Authentication](public/screenshots/auth.png)
+![Authentication](./docs/screenshots/auth.png)
 
 ### Dashboard
-Overview of income, expenses, savings rate, and spending analytics.
 
-![Dashboard](public/screenshots/dashboard.png)
+![Dashboard](./docs/screenshots/dashboard.png)
 
 ### Transactions
-Searchable transaction management interface.
 
-![Transactions](public/screenshots/transactions.png)
+![Transactions](./docs/screenshots/transactions.png)
+
+## Setup
+
+### Prerequisites
+- Node 18+
+- Supabase project
+- OpenAI API key
+
+### Local Setup
+1. Clone the repository
+2. Run `npm install`
+3. Copy `.env.example` to `.env.local`
+4. Fill in the required environment values in `.env.local`
+5. Run `npm run dev` to start the development server
+
+## Deployment
+
+### Vercel
+
+* Import repository from GitHub
+* Configure environment variables
+* Deploy the application
+
+### Supabase
+
+* Create project
+* Run migrations located in `supabase/migrations/`
+* Configure authentication (Email/Password)
 
 ## Current Status
 
@@ -101,28 +108,37 @@ Completed:
 * Dashboard
 * Transaction management
 * Analytics views
-
-Planned:
 * Budget management
-* Spending insights
-* Financial forecasting
+* AI Chat integrations
 
-## Key Learnings
-* Full-stack application development
-* Authentication and authorization
-* Database design
-* Analytics dashboards
-* Responsive UI engineering
-* State management
+## Future Improvements
 
-## Prerequisites
-- Node 18+
-- Supabase project
-- OpenAI API key
+* Advanced spending insights
+* Financial forecasting models
+* Plaid integration for bank syncing
 
-## Setup
-1. Clone the repository
-2. Run `npm install`
-3. Copy `.env.example` to `.env.local`
-4. Fill in the required environment values in `.env.local`
-5. Run `npm run dev` to start the development server
+## Engineering Highlights
+
+* Next.js App Router for optimized server-side rendering and data mutations
+* TypeScript type safety across the entire application stack
+* Supabase Authentication with secure session management
+* PostgreSQL persistence utilizing Row Level Security (RLS)
+* Dashboard analytics aggregating complex financial data points
+* Component-driven architecture using robust UI patterns
+* Responsive UI design implementing Tailwind CSS utility classes
+
+## Live Demo
+
+Deployment coming soon.
+
+## Suggested GitHub Topics
+
+* nextjs
+* typescript
+* supabase
+* postgresql
+* finance
+* personal-finance
+* dashboard
+* tailwindcss
+* full-stack
