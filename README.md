@@ -196,13 +196,7 @@ Refer to `.env.example` for the full list of required variables.
 
 `nextjs` `typescript` `supabase` `postgresql` `personal-finance` `finance-dashboard` `tailwindcss` `full-stack` `vercel-ai-sdk` `openai`
 
----
 
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
 
 <div align="center">
   Built with ❤️ by <a href="https://github.com/abhi128nandan">abhi128nandan</a>
