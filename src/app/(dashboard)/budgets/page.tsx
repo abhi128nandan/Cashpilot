@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
-import { getBudgets } from '@/lib/mock-data';
+import { redirect } from 'next/navigation';
+import { requireAuth } from '@/lib/auth/guard';
+import { getCategories } from '@/lib/db/queries';
+import { getUserBudgets } from '@/lib/queries/budgets';
 import BudgetList from '@/components/features/budgets/budget-list';
 
 export const metadata: Metadata = {
@@ -8,6 +11,17 @@ export const metadata: Metadata = {
 };
 
 export default async function BudgetsPage() {
-  const budgets = await getBudgets();
-  return <BudgetList budgets={budgets} />;
+  let user;
+  try {
+    user = await requireAuth();
+  } catch {
+    redirect('/login');
+  }
+
+  const [budgets, categories] = await Promise.all([
+    getUserBudgets(user.id),
+    getCategories(user.id)
+  ]);
+
+  return <BudgetList budgets={budgets} categories={categories} />;
 }

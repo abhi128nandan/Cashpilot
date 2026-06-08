@@ -26,20 +26,22 @@ export default function RecentTransactions({ transactions }: RecentTransactionsP
               <div
                 className={styles.categoryIcon}
                 style={{
-                  background: txn.category?.color
-                    ? `${txn.category.color.replace(')', ', 0.15)')}`
-                    : 'var(--color-bg-hover)',
-                  color: txn.category?.color || 'var(--color-text-secondary)',
+                  background: txn.type === 'income'
+                    ? 'hsla(160, 78%, 42%, 0.15)'
+                    : (txn.category?.color ? `${txn.category.color.replace(')', ', 0.15)')}` : 'var(--color-bg-hover)'),
+                  color: txn.type === 'income' 
+                    ? 'hsl(160, 78%, 52%)' 
+                    : (txn.category?.color || 'var(--color-text-secondary)'),
                 }}
               >
-                {txn.category?.icon || '💳'}
+                {txn.type === 'income' ? '💰' : (txn.category?.icon || '💳')}
               </div>
               <div className={styles.rowInfo}>
                 <span className={styles.merchant}>
                   {txn.merchant || 'Unknown'}
                 </span>
                 <span className={styles.meta}>
-                  {txn.category?.name || 'Uncategorized'} · {formatDate(txn.transactionDate)}
+                  {txn.type === 'income' ? 'Income' : (txn.category?.name || 'Uncategorized')} · {formatDate(txn.transactionDate)}
                 </span>
               </div>
             </div>

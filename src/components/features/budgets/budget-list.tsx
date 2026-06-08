@@ -1,12 +1,19 @@
-import type { Budget } from '@/types';
+'use client';
+
+import { useState } from 'react';
+import type { Budget, Category } from '@/types';
 import { formatCurrency } from '@/lib/utils/formatters';
+import { safePercentage } from '@/lib/math';
+import BudgetForm from './budget-form';
 import styles from './budget-list.module.css';
 
 interface BudgetListProps {
   budgets: Budget[];
+  categories: Category[];
 }
 
-export default function BudgetList({ budgets }: BudgetListProps) {
+export default function BudgetList({ budgets, categories }: BudgetListProps) {
+  const [showForm, setShowForm] = useState(false);
   const totalBudget = budgets.reduce((sum, b) => sum + b.limitAmount, 0);
   const totalSpent = budgets.reduce((sum, b) => sum + b.spentAmount, 0);
 
@@ -28,14 +35,14 @@ export default function BudgetList({ budgets }: BudgetListProps) {
         </div>
         <div className={styles.overviewCard}>
           <span className={styles.overviewLabel}>Utilization</span>
-          <span className={styles.overviewValue}>{((totalSpent / totalBudget) * 100).toFixed(1)}%</span>
+          <span className={styles.overviewValue}>{safePercentage(totalSpent, totalBudget).toFixed(1)}%</span>
         </div>
       </div>
 
       {/* Budget cards */}
       <div className={styles.grid}>
         {budgets.map((budget, i) => {
-          const pct = Math.min((budget.spentAmount / budget.limitAmount) * 100, 100);
+          const pct = Math.min(safePercentage(budget.spentAmount, budget.limitAmount), 100);
           const remaining = budget.limitAmount - budget.spentAmount;
           const isWarning = pct >= 60 && pct < 85;
           const isDanger = pct >= 85;
@@ -83,11 +90,15 @@ export default function BudgetList({ budgets }: BudgetListProps) {
         })}
 
         {/* Add budget card */}
-        <button className={styles.addCard} id="add-budget-btn">
+        <button className={styles.addCard} id="add-budget-btn" onClick={() => setShowForm(true)}>
           <div className={styles.addIcon}>+</div>
           <span className={styles.addLabel}>Add Budget</span>
         </button>
       </div>
+
+      {showForm && (
+        <BudgetForm categories={categories} onClose={() => setShowForm(false)} />
+      )}
     </div>
   );
 }

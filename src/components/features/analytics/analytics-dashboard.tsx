@@ -5,7 +5,7 @@ import {
   AreaChart, Area,
 } from 'recharts';
 import type { MonthlyTrend, SpendingByCategory, DashboardStats } from '@/types';
-import { formatCurrency } from '@/lib/utils/formatters';
+import { formatCurrency, formatCompactNumber } from '@/lib/utils/formatters';
 import styles from './analytics-dashboard.module.css';
 
 interface Props {
@@ -14,16 +14,16 @@ interface Props {
   stats: DashboardStats;
 }
 
-function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; dataKey: string; color: string }>; label?: string }) {
+function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; name: string; color: string }>; label?: string }) {
   if (!active || !payload) return null;
   return (
     <div className={styles.tooltip}>
       <p className={styles.tooltipLabel}>{label}</p>
       {payload.map((p) => (
-        <div key={p.dataKey} className={styles.tooltipRow}>
+        <div key={p.name} className={styles.tooltipRow}>
           <span className={styles.tooltipDot} style={{ background: p.color }} />
-          <span className={styles.tooltipKey}>{p.dataKey}</span>
-          <span className={styles.tooltipVal}>${p.value.toLocaleString()}</span>
+          <span className={styles.tooltipKey}>{p.name}</span>
+          <span className={styles.tooltipVal}>{formatCurrency(p.value)}</span>
         </div>
       ))}
     </div>
@@ -48,7 +48,7 @@ export default function AnalyticsDashboard({ trends, spending, stats }: Props) {
           <BarChart data={trends} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsla(228, 20%, 30%, 0.2)" vertical={false} />
             <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(220, 14%, 68%)', fontSize: 12 }} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(220, 14%, 68%)', fontSize: 12 }} tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(220, 14%, 68%)', fontSize: 12 }} tickFormatter={(v: number) => formatCompactNumber(v)} />
             <Tooltip content={<ChartTooltip />} />
             <Bar dataKey="income" fill="hsl(160, 78%, 42%)" radius={[6, 6, 0, 0]} barSize={28} />
             <Bar dataKey="expenses" fill="hsl(0, 78%, 54%)" radius={[6, 6, 0, 0]} barSize={28} />

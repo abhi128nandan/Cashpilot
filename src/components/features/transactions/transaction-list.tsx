@@ -3,6 +3,11 @@
 import { useState, useMemo } from 'react';
 import type { Transaction, Category, TransactionType } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils/formatters';
+import { useTransactions } from '@/hooks/use-transactions';
+import { toast } from 'sonner';
+import { Trash2 } from 'lucide-react';
+import TransactionForm from './transaction-form';
+import DeleteTransactionModal from './delete-transaction-modal';
 import styles from './transaction-list.module.css';
 
 interface TransactionListProps {
@@ -14,10 +19,22 @@ export default function TransactionList({
   transactions,
   categories,
 }: TransactionListProps) {
+  const { deleteTransaction, isDeleting } = useTransactions();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<TransactionType | 'all'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [showForm, setShowForm] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteTransaction(id);
+      setDeletingId(null);
+    } catch (error) {
+      toast.error('Failed to delete transaction. Please try again.');
+    }
+  };
 
   const filtered = useMemo(() => {
     let result = [...transactions];
@@ -141,6 +158,13 @@ export default function TransactionList({
         >
           {sortOrder === 'desc' ? '↓ Newest' : '↑ Oldest'}
         </button>
+
+        <button
+          onClick={() => setShowForm(true)}
+          style={{ background: 'var(--gradient-accent)', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontWeight: 500, cursor: 'pointer', marginLeft: 'auto' }}
+        >
+          + Add Transaction
+        </button>
       </div>
 
       {/* Table */}
@@ -153,6 +177,7 @@ export default function TransactionList({
               <th className={styles.th}>Date</th>
               <th className={styles.th}>Type</th>
               <th className={`${styles.th} ${styles.thRight}`}>Amount</th>
+              <th className={`${styles.th} ${styles.thRight}`}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -166,13 +191,14 @@ export default function TransactionList({
                     <span
                       className={styles.catDot}
                       style={{
-                        background:
-                          txn.category?.color || 'var(--color-text-tertiary)',
+                        background: txn.type === 'income' 
+                          ? 'hsl(160, 78%, 52%)' 
+                          : (txn.category?.color || 'var(--color-text-tertiary)'),
                       }}
                     />
                     <div>
                       <span className={styles.merchantName}>
-                        {txn.merchant || 'Unknown'}
+                        {txn.merchant || txn.description || txn.category?.name || 'Transaction'}
                       </span>
                       {txn.description && (
                         <span className={styles.txnDesc}>{txn.description}</span>
@@ -182,7 +208,7 @@ export default function TransactionList({
                 </td>
                 <td className={styles.td}>
                   <span className={styles.categoryBadge}>
-                    {txn.category?.icon} {txn.category?.name || 'Uncategorized'}
+                    {txn.type === 'income' ? '💰 Income' : (txn.category?.icon ? `${txn.category.icon} ${txn.category.name}` : 'Uncategorized')}
                   </span>
                 </td>
                 <td className={styles.td}>
@@ -213,6 +239,15 @@ export default function TransactionList({
                     {formatCurrency(txn.amount)}
                   </span>
                 </td>
+                <td className={`${styles.td} ${styles.actionCell}`}>
+                  <button 
+                    onClick={() => setDeletingId(txn.id)}
+                    className={styles.deleteBtn} 
+                    title="Delete transaction"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -223,6 +258,21 @@ export default function TransactionList({
           </div>
         )}
       </div>
+      
+      {showForm && (
+        <TransactionForm 
+          categories={categories} 
+          onClose={() => setShowForm(false)} 
+        />
+      )}
+
+      {deletingId && (
+        <DeleteTransactionModal 
+          onConfirm={() => handleDelete(deletingId)}
+          onCancel={() => setDeletingId(null)}
+          isDeleting={isDeleting}
+        />
+      )}
     </div>
   );
 }

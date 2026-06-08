@@ -1,0 +1,186 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: hsla(228, 20%, 8%, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: hsla(228, 20%, 16%, 0.95);
+  border: 1px solid hsla(228, 20%, 40%, 0.2);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 450px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 48px hsla(228, 20%, 5%, 0.5);
+  overflow: hidden;
+  animation: modalEnter 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid hsla(228, 20%, 40%, 0.1);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-tertiary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  background: hsla(228, 20%, 30%, 0.5);
+  color: var(--color-text-primary);
+}
+
+.form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: hsla(228, 20%, 40%, 0.3) transparent;
+}
+
+.form::-webkit-scrollbar {
+  width: 6px;
+}
+.form::-webkit-scrollbar-thumb {
+  background-color: hsla(228, 20%, 40%, 0.3);
+  border-radius: 6px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.input {
+  background: hsla(228, 20%, 10%, 0.5);
+  border: 1px solid hsla(228, 20%, 40%, 0.3);
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.typeSelector {
+  display: flex;
+  background: hsla(228, 20%, 10%, 0.5);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.typeBtn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.activeExpense {
+  background: hsla(0, 78%, 54%, 0.15);
+  color: hsl(0, 78%, 64%);
+  box-shadow: 0 0 12px hsla(0, 78%, 54%, 0.2);
+}
+
+.activeIncome {
+  background: hsla(160, 78%, 42%, 0.15);
+  color: hsl(160, 78%, 52%);
+  box-shadow: 0 0 12px hsla(160, 78%, 42%, 0.2);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.cancelBtn {
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid hsla(228, 20%, 40%, 0.3);
+  color: var(--color-text-secondary);
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn:hover {
+  background: hsla(228, 20%, 30%, 0.3);
+  color: var(--color-text-primary);
+}
+
+.submitBtn {
+  padding: 10px 24px;
+  background: var(--gradient-accent);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.submitBtn:hover {
+  opacity: 0.9;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

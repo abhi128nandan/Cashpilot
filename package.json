@@ -2,22 +2,33 @@
   "name": "next_js_project",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "scripts": {
+    "predev": "node -e \"const fs=require('fs');if(!fs.existsSync('./src')){console.error('ERROR: Run npm commands from the project root (where package.json lives)');process.exit(1)}\"",
     "dev": "next dev",
+    "dev:webpack": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean": "node -e \"const fs=require('fs');fs.rmSync('.next',{recursive:true,force:true});console.log('Cleaned .next')\""
   },
   "dependencies": {
-    "@ai-sdk/openai": "^3.0.52",
+    "@ai-sdk/openai": "^3.0.65",
+    "@ai-sdk/react": "^3.0.193",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.103.3",
-    "ai": "^6.0.159",
+    "@tanstack/react-query": "^5.100.14",
+    "@tanstack/react-query-devtools": "^5.100.14",
+    "ai": "^6.0.191",
     "date-fns": "^4.1.0",
+    "lucide-react": "^1.16.0",
     "next": "16.2.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
+    "sonner": "^2.0.7",
     "stripe": "^22.0.1",
     "uuid": "^13.0.0",
     "zod": "^4.3.6"

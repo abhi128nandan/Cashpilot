@@ -22,9 +22,12 @@ export async function GET(request: Request) {
       } else {
         return NextResponse.redirect(`${origin}${next}`)
       }
+    } else {
+      // if we're here, there was an error exchanging the code
+      console.error('[auth-callback] error exchanging code for session:', error)
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/login?error=auth-code-error`)
+  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`)
 }

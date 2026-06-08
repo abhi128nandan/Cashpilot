@@ -43,14 +43,25 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/register') &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    request.nextUrl.pathname !== '/'
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  // Allowlist-based route protection.
+  // Only routes that start with a protected prefix require authentication.
+  // This is safer than a denylist: new public routes (e.g. /pricing, /about,
+  // /api/webhooks/stripe) are public by default without needing a code change.
+  const PROTECTED_PREFIXES = [
+    '/dashboard',
+    '/transactions',
+    '/budgets',
+    '/analytics',
+    '/chat',
+    '/settings',
+  ]
+
+  const pathname = request.nextUrl.pathname
+  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix)
+  )
+
+  if (!user && isProtected) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)

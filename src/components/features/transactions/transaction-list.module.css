@@ -164,11 +164,45 @@
 }
 
 .tr {
+  position: relative;
   transition: background var(--duration-fast) var(--ease-out);
 }
 
 .tr:hover {
   background: var(--color-bg-hover);
+}
+
+.actionCell {
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+  text-align: right;
+  width: 40px;
+}
+
+.tr:hover .actionCell {
+  opacity: 1;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-danger-400);
+  cursor: pointer;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast);
+}
+
+.deleteBtn:hover {
+  background: hsla(0, 78%, 54%, 0.15);
+}
+
+.deleteBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .tr + .tr {

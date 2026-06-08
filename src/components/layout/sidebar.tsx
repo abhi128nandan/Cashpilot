@@ -1,5 +1,7 @@
 'use client';
 
+import { useRef } from 'react';
+
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth/use-auth';
@@ -22,7 +24,9 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
-  const supabase = createClient();
+  // Stable ref — supabase client should not be recreated on every render.
+  const supabaseRef = useRef(createClient());
+  const supabase = supabaseRef.current;
   // Derive initials from user metadata
   const fullName = (user?.user_metadata?.full_name as string) ?? 'User';
   const initials = fullName
@@ -113,7 +117,6 @@ export default function Sidebar() {
           <div className={styles.userAvatar}>{initials}</div>
           <div className={styles.userInfo}>
             <span className={styles.userName}>{fullName}</span>
-            <span className={styles.userPlan}>Free Plan</span>
           </div>
         </div>
       </div>

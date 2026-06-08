@@ -1,30 +1,32 @@
 import { format, formatDistanceToNow, isToday, isYesterday, parseISO } from 'date-fns';
 
+import { safeNumber } from '@/lib/math';
+
 /**
- * Format a currency amount with locale-aware formatting.
+ * Format a currency amount with locale-aware formatting (INR).
  */
-export function formatCurrency(
-  amount: number,
-  currency: string = 'USD',
-  locale: string = 'en-US'
-): string {
-  return new Intl.NumberFormat(locale, {
+export function formatCurrency(amount: number | null | undefined, _currency?: string, _locale?: string): string {
+  const num = safeNumber(amount);
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency,
+    currency: 'INR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount);
+  }).format(num);
 }
 
 /**
- * Format a compact number (e.g., 1.2K, 3.4M)
+ * Format a compact number with currency (e.g., ₹1.2L, ₹3.4Cr)
  */
-export function formatCompactNumber(value: number): string {
-  return new Intl.NumberFormat('en-US', {
+export function formatCompactNumber(value: number | null | undefined): string {
+  const num = safeNumber(value);
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
     notation: 'compact',
     compactDisplay: 'short',
     maximumFractionDigits: 1,
-  }).format(value);
+  }).format(num);
 }
 
 /**

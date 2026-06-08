@@ -11,6 +11,7 @@ import {
   Legend,
 } from 'recharts';
 import type { MonthlyTrend } from '@/types';
+import { formatCurrency, formatCompactNumber } from '@/lib/utils/formatters';
 import styles from './spending-chart.module.css';
 
 interface SpendingChartProps {
@@ -32,7 +33,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
             {entry.dataKey === 'income' ? 'Income' : entry.dataKey === 'expenses' ? 'Expenses' : 'Net'}
           </span>
           <span className={styles.tooltipValue}>
-            ${entry.value.toLocaleString()}
+            {formatCurrency(entry.value as number)}
           </span>
         </div>
       ))}
@@ -85,7 +86,7 @@ export default function SpendingChart({ data }: SpendingChartProps) {
               axisLine={false}
               tickLine={false}
               tick={{ fill: 'hsl(220, 14%, 68%)', fontSize: 12 }}
-              tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+              tickFormatter={(v: number) => formatCompactNumber(v)}
               dx={-4}
             />
             <Tooltip content={<CustomTooltip />} />

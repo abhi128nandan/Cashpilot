@@ -34,32 +34,7 @@ const features = [
   },
 ];
 
-const tiers = [
-  {
-    name: 'Free',
-    price: '$0',
-    period: '/forever',
-    features: ['50 transactions/month', 'Basic dashboard', '3 budget categories', 'Community support'],
-    cta: 'Get Started',
-    highlighted: false,
-  },
-  {
-    name: 'Pro',
-    price: '$12',
-    period: '/month',
-    features: ['Unlimited transactions', 'AI chat & insights', 'Unlimited budgets', 'Anomaly detection', 'CSV import', 'Priority support'],
-    cta: 'Start Free Trial',
-    highlighted: true,
-  },
-  {
-    name: 'Enterprise',
-    price: '$49',
-    period: '/month',
-    features: ['Everything in Pro', 'Team collaboration', 'API access', 'Custom integrations', 'Dedicated account manager', 'SLA guarantee'],
-    cta: 'Contact Sales',
-    highlighted: false,
-  },
-];
+
 
 export default function LandingPage() {
   return (
@@ -77,7 +52,6 @@ export default function LandingPage() {
           </div>
           <div className={styles.navLinks}>
             <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
             <Link href="/login" className={styles.navCta}>Launch App →</Link>
           </div>
         </div>
@@ -110,7 +84,7 @@ export default function LandingPage() {
           </div>
           <div className={styles.heroStats}>
             <div className={styles.heroStat}>
-              <span className={styles.heroStatValue}>$2.4M+</span>
+              <span className={styles.heroStatValue}>₹20Cr+</span>
               <span className={styles.heroStatLabel}>Tracked</span>
             </div>
             <div className={styles.heroStatDivider} />
@@ -146,41 +120,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className={styles.pricing} id="pricing">
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Simple, transparent pricing</h2>
-          <p className={styles.sectionDesc}>Start free. Upgrade when you need more power.</p>
-        </div>
-        <div className={styles.pricingGrid}>
-          {tiers.map((tier) => (
-            <div
-              key={tier.name}
-              className={`${styles.pricingCard} ${tier.highlighted ? styles.pricingHighlighted : ''}`}
-            >
-              {tier.highlighted && <div className={styles.popularBadge}>Most Popular</div>}
-              <h3 className={styles.pricingName}>{tier.name}</h3>
-              <div className={styles.pricingPrice}>
-                <span className={styles.pricingAmount}>{tier.price}</span>
-                <span className={styles.pricingPeriod}>{tier.period}</span>
-              </div>
-              <ul className={styles.pricingFeatures}>
-                {tier.features.map((f) => (
-                  <li key={f} className={styles.pricingFeature}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M3 8L6.5 11.5L13 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button className={tier.highlighted ? styles.btnPrimary : styles.btnSecondary} style={{ width: '100%' }}>
-                {tier.cta}
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
+
 
       {/* Footer */}
       <footer className={styles.footer}>

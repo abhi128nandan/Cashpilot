@@ -1,14 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './chat-interface.module.css';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
 
 const suggestedPrompts = [
   'How much did I spend on dining this month?',
@@ -19,56 +12,113 @@ const suggestedPrompts = [
   'How can I save more this month?',
 ];
 
-const mockResponses: Record<string, string> = {
-  default: `Based on your transaction history, here's what I can see:
-
-**This Month's Summary:**
-- 💰 Total Income: $10,900.00
-- 📉 Total Expenses: $3,638.09
-- 📊 Net Savings: $7,261.91 (66.6% savings rate)
-
-Your top spending categories are Housing ($2,200), Investments ($500), and Travel ($350). 
-
-Your savings rate of 66.6% is excellent — well above the recommended 20%. Would you like me to analyze any specific category in more detail?`,
-
-  dining: `Here's your **Food & Dining** breakdown for this month:
-
-| Merchant | Amount | Date |
-|----------|--------|------|
-| Whole Foods Market | $67.50 | Mar 2 |
-| Olive Garden | $42.80 | Mar 6 |
-| Starbucks | $12.50 | Mar 12 |
-
-**Total: $122.80** across 3 transactions.
-
-📊 This is **18% under** your $400 monthly dining budget. You're on track! At this pace, you'll end the month around $245 — saving approximately $155 from your dining budget.`,
-
-  budget: `Let me check your budget status:
-
-| Category | Budget | Spent | Remaining | Status |
-|----------|--------|-------|-----------|--------|
-| 🍕 Food & Dining | $400 | $122.80 | $277.20 | ✅ On track |
-| 🎬 Entertainment | $150 | $32.00 | $118.00 | ✅ On track |
-| 🛍️ Shopping | $300 | $189.99 | $110.01 | ⚠️ Watch it |
-| 🚗 Transportation | $200 | $45.00 | $155.00 | ✅ On track |
-
-**Shopping** is at 63% with 17 days left — you might want to slow down there. All other categories look healthy!`,
-
-  unusual: `I detected **2 potential anomalies** in your recent transactions:
-
-1. ⚠️ **Amazon — $189.99** (Mar 7)
-   This is 3x higher than your average shopping transaction ($63.33). It was for "Noise-cancelling headphones."
-
-2. ℹ️ **United Airlines — $350.00** (Mar 13)
-   First-time merchant detected. This appears to be a travel booking.
-
-Neither seems fraudulent, but the Amazon purchase pushed your Shopping category to 63% of its monthly budget. Want me to adjust your budget recommendations?`,
-};
-
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<any[]>([]);
+  const [localInput, setLocalInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
+  
+  const sendMessage = async (message: string) => {
+    if (!message.trim()) return;
+
+    const userMessage = {
+      id: `msg-${Date.now()}`,
+      role: 'user',
+      content: message,
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setLocalInput('');
+    setIsLoading(true);
+    setError(null);
+
+    const updatedMessages = [...messages, userMessage];
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: updatedMessages,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text().catch(() => null);
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `msg-${Date.now() + 1}`,
+            role: 'assistant',
+            content: errorData || 'Something went wrong while generating response.',
+          },
+        ]);
+
+        setIsLoading(false);
+        return;
+      }
+
+      // Read the stream
+      if (!response.body) throw new Error('No body in response');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      
+      const assistantMessageId = `msg-${Date.now() + 1}`;
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: assistantMessageId,
+          role: 'assistant',
+          content: '',
+        },
+      ]);
+
+      let fullContent = '';
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        
+        // Vercel AI SDK toTextStreamResponse streams out strings prefixed with '0:'
+        // For simplicity, we can do a naive parse.
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('0:')) {
+            try {
+              const text = JSON.parse(line.slice(2));
+              fullContent += text;
+              
+              setMessages((prev) => prev.map(msg => 
+                msg.id === assistantMessageId 
+                  ? { ...msg, content: fullContent }
+                  : msg
+              ));
+            } catch (e) {
+              // Ignore parse errors for partial chunks
+            }
+          }
+        }
+      }
+    } catch (error: any) {
+      console.error(error);
+      setError(error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `msg-${Date.now() + 1}`,
+          role: 'assistant',
+          content: 'Something went wrong while generating response.',
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -76,47 +126,12 @@ export default function ChatInterface() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const getResponse = (query: string): string => {
-    const q = query.toLowerCase();
-    if (q.includes('dining') || q.includes('food') || q.includes('restaurant')) return mockResponses.dining;
-    if (q.includes('budget') || q.includes('track')) return mockResponses.budget;
-    if (q.includes('unusual') || q.includes('anomal') || q.includes('suspicious')) return mockResponses.unusual;
-    return mockResponses.default;
-  };
-
-  const handleSend = async (content?: string) => {
-    const text = content || input.trim();
-    if (!text || isLoading) return;
-
-    const userMsg: Message = {
-      id: `msg-${Date.now()}`,
-      role: 'user',
-      content: text,
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
-    setInput('');
-    setIsLoading(true);
-
-    // Simulate AI streaming delay
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-
-    const assistantMsg: Message = {
-      id: `msg-${Date.now() + 1}`,
-      role: 'assistant',
-      content: getResponse(text),
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, assistantMsg]);
-    setIsLoading(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      if (localInput?.trim() && !isLoading) {
+        e.currentTarget.form?.requestSubmit();
+      }
     }
   };
 
@@ -135,7 +150,7 @@ export default function ChatInterface() {
               <button
                 key={prompt}
                 className={styles.promptChip}
-                onClick={() => handleSend(prompt)}
+                onClick={() => setLocalInput(prompt)}
               >
                 {prompt}
               </button>
@@ -156,14 +171,14 @@ export default function ChatInterface() {
               </div>
               <div className={styles.messageBubble}>
                 <div className={styles.messageContent}>
-                  {msg.content.split('\n').map((line, i) => (
+                  {msg.content.split('\n').map((line: string, i: number) => (
                     <p key={i}>{line || <br />}</p>
                   ))}
                 </div>
               </div>
             </div>
           ))}
-          {isLoading && (
+          {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
             <div className={`${styles.message} ${styles.messageAssistant}`}>
               <div className={styles.messageAvatar}>🤖</div>
               <div className={styles.messageBubble}>
@@ -175,16 +190,34 @@ export default function ChatInterface() {
               </div>
             </div>
           )}
+          {error && (
+            <div className={`${styles.message} ${styles.messageAssistant}`}>
+              <div className={styles.messageAvatar}>⚠️</div>
+              <div className={styles.messageBubble}>
+                <div className={styles.messageContent}>
+                  <p style={{ color: 'var(--color-danger-400)' }}>
+                    AI insights temporarily unavailable. Please try again later.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
       )}
 
-      <div className={styles.inputArea}>
+      <form 
+        className={styles.inputArea} 
+        onSubmit={(e) => {
+          e.preventDefault();
+          sendMessage(localInput);
+        }}
+      >
         <div className={styles.inputWrapper}>
           <textarea
             ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
+            value={localInput}
+            onChange={(e) => setLocalInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask about your finances..."
             className={styles.textInput}
@@ -192,8 +225,8 @@ export default function ChatInterface() {
             id="chat-input"
           />
           <button
-            onClick={() => handleSend()}
-            disabled={!input.trim() || isLoading}
+            type="submit"
+            disabled={!localInput?.trim() || isLoading}
             className={styles.sendBtn}
             id="chat-send"
           >
@@ -211,7 +244,7 @@ export default function ChatInterface() {
         <p className={styles.disclaimer}>
           CashPilot AI provides insights based on your data. Always verify financial decisions independently.
         </p>
-      </div>
+      </form>
     </div>
   );
 }
