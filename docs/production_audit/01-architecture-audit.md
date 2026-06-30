@@ -7,7 +7,7 @@ CashPilot is built using a modern decoupled full-stack architecture:
 - **Styling:** Tailwind CSS + CSS Modules
 - **Authentication:** Supabase Auth (Server-side middleware protected)
 - **Database:** Supabase PostgreSQL with Row Level Security (RLS)
-- **AI Integration:** Vercel AI SDK (/api/chat) and OpenRouter (/api/ai/chat)
+- **AI Integration:** Vercel AI SDK with Groq API (/api/chat)
 - **State Management:** React Context + React Query (via @tanstack/react-query)
 
 ## 2. Folder Structure
@@ -24,8 +24,7 @@ CashPilot is built using a modern decoupled full-stack architecture:
 
 ## 4. API Architecture
 - /api/transactions (GET/POST): Robust, includes rate-limiting, auth checks, query validation via Zod, and duplicate detection.
-- /api/chat (POST): Streams OpenAI responses. Auth is verified.
-- /api/ai/chat (POST): Non-streaming OpenRouter endpoint. Redundant/Dead Code.
+- /api/chat (POST): Streams Groq AI responses. Auth is verified.
 
 ## 5. Security & Middleware
 - src/middleware.ts handles auth checks, session refresh, and basic security headers.

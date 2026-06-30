@@ -8,9 +8,9 @@ export interface AIProviderConfig {
 
 export function getAIProvider() {
   // 1. Groq (Preferred Provider)
-  if (env.groqKey) {
+  if (env.GROQ_API_KEY) {
     const groq = createGroq({
-      apiKey: env.groqKey,
+      apiKey: env.GROQ_API_KEY,
     });
     
     const primaryModel = 'llama-3.3-70b-versatile';
