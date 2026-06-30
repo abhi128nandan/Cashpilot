@@ -1,5 +1,5 @@
 import { streamText } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { getAIProvider } from '@/lib/ai/provider';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -13,6 +13,15 @@ export async function POST(req: Request) {
 
     if (!user) {
       return new NextResponse('Unauthorized', { status: 401 });
+    }
+
+    const aiProvider = getAIProvider();
+
+    if (!aiProvider) {
+      return NextResponse.json(
+        { error: 'No AI provider configured. Please set GROQ_API_KEY.' },
+        { status: 503 }
+      );
     }
 
     const { messages } = await req.json();
@@ -32,7 +41,7 @@ export async function POST(req: Request) {
     const contextData = JSON.stringify(transactions || []);
 
     const result = streamText({
-      model: openai('gpt-4o-mini'),
+      model: aiProvider.model as any,
       messages,
       system: `You are CashPilot AI, a financial assistant. You help users understand their spending, track budgets, and find anomalies.
 Here is the user's recent transaction data (last 30 transactions):

@@ -16,11 +16,11 @@ export async function sendMessageToAI(message: string) {
     const aiProvider = getAIProvider();
     
     if (!aiProvider) {
-      return "⚠️ No AI Provider Configured. Please configure OPENROUTER_API_KEY in your .env.local file. See FREE_AI_SETUP.md for instructions.";
+      return "⚠️ No AI Provider Configured. Please configure GROQ_API_KEY in your .env.local file. See FREE_AI_SETUP.md for instructions.";
     }
 
     const { text } = await generateText({
-      model: aiProvider.model,
+      model: aiProvider.model as any,
       system: systemPrompt,
       prompt: message,
       temperature: 0.7,

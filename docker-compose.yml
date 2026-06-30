@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  cashpilot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cashpilot-app:latest
+    container_name: cashpilot_web
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=production
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health/liveness"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

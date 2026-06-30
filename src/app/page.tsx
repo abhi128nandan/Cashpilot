@@ -134,7 +134,9 @@ export default function LandingPage() {
             <a href="#">Terms of Service</a>
             <a href="#">GitHub</a>
           </div>
-          <p className={styles.footerCopy}>© 2024 CashPilot. Built with Next.js, Supabase, and OpenAI.</p>
+        </div>
+        <div className={styles.footerBottom}>
+          <p className={styles.footerCopy}>© 2024 CashPilot. Built with Next.js, Supabase, and Groq.</p>
         </div>
       </footer>
     </div>

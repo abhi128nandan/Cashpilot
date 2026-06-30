@@ -10,7 +10,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[Features](#-features) · [Tech Stack](#-tech-stack) · [Screenshots](#-screenshots) · [Getting Started](#-getting-started) · [Deployment](#-deployment) · [Roadmap](#-roadmap)
+[Features](#-features) · [Tech Stack](#-tech-stack) · [Screenshots](#-screenshots) · [Getting Started](#-getting-started) · [Deployment](#-deployment) · [Enterprise Ready](#-enterprise-production-ready) · [Roadmap](#-roadmap)
 
 </div>
 
@@ -154,6 +154,30 @@ Refer to `.env.example` for the full list of required variables.
 1. Create a new project at [supabase.com](https://supabase.com/)
 2. Navigate to the **SQL Editor** and run all migration files found in `supabase/migrations/` in order
 3. Enable **Email/Password** authentication under Authentication → Providers
+
+### Docker (Self-hosted)
+
+CashPilot is fully containerized for enterprise deployments. See the detailed guides:
+- [Docker Guide](./docs/docker-guide.md)
+- [Deployment Guide](./docs/deployment-guide.md)
+
+---
+
+## 🛡️ Enterprise Production Ready
+
+CashPilot has undergone a complete production-readiness audit to ensure resilience, scalability, and security:
+- **Smart Chatbot Fallback**: Graceful degradation UI when AI APIs fail or rate limit.
+- **CI/CD Pipeline**: GitHub Actions for automated linting, type-checking, testing, and building.
+- **Dockerized**: Multi-stage, production-optimized Dockerfile with non-root security.
+- **Observability**: Health endpoints (`/api/health`) and structured logging enabled.
+- **Testing**: Pre-configured with Jest, React Testing Library, and Playwright.
+
+Read the detailed audit reports:
+- [Architecture Audit](./docs/production_audit/01-architecture-audit.md)
+- [Production Readiness](./docs/production_audit/02-production-readiness.md)
+- [Security Audit](./docs/production_audit/03-security-audit.md)
+- [Chatbot Verification](./docs/production_audit/04-chatbot-verification.md)
+- [Production Checklist](./docs/production-checklist.md)
 
 ---
 
