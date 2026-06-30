@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 import { logger } from '@/lib/utils/logger'
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // 1. Request Tracing: Propagate a unique request ID
   const requestId = request.headers.get('x-request-id') ?? crypto.randomUUID()
   request.headers.set('x-request-id', requestId)

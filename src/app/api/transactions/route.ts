@@ -58,7 +58,7 @@ export async function GET(request: NextRequest): Promise<Response> {
 
     // 2. Rate limiting (Per IP + User)
     const ip = request.headers.get('x-forwarded-for') ?? 'unknown';
-    const rateLimit = await checkRateLimit(ip, user.id);
+    const rateLimit = checkRateLimit(ip, user.id);
     if (!rateLimit.allowed) {
       return respond.tooManyRequests(rateLimit.reason || 'Too Many Requests');
     }
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     // 3. Rate limiting (Per IP + User)
     const ip = request.headers.get('x-forwarded-for') ?? 'unknown';
-    const rateLimit = await checkRateLimit(ip, user.id);
+    const rateLimit = checkRateLimit(ip, user.id);
     if (!rateLimit.allowed) {
       return respond.tooManyRequests(rateLimit.reason || 'Too Many Requests');
     }

@@ -45,12 +45,6 @@ export const mockCategories: Category[] = [
 ];
 
 // ─── Mock Transactions ───────────────────────────────────────
-export function checkMockSafety() {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('FATAL: Mock data access is strictly prohibited in production.');
-  }
-}
-
 export const mockTransactions: Transaction[] = [
   {
     id: 'txn_001', userId: mockUser.id, categoryId: 'cat_08', amount: 8500.00, currency: 'USD',
@@ -226,39 +220,20 @@ export const mockAnomalies: Anomaly[] = [
 
 // ─── Data Access Functions (mock DB queries) ─────────────────
 export async function getUser(): Promise<User> {
-  checkMockSafety();
   return mockUser;
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  checkMockSafety();
   return mockDashboardStats;
 }
 
-export const getMockTransactions = (userId: string) => {
-  checkMockSafety();
-  return mockTransactions;
-};
-
-export const getMockCategories = () => {
-  checkMockSafety();
-  return mockCategories;
-};
-
-export const getMockBudgets = () => {
-  checkMockSafety();
-  return mockBudgets;
-};
-
 export async function getTransactions(): Promise<Transaction[]> {
-  checkMockSafety();
   return [...mockTransactions].sort(
     (a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
   );
 }
 
 export async function getRecentTransactions(limit: number = 5): Promise<Transaction[]> {
-  checkMockSafety();
   const sorted = [...mockTransactions].sort(
     (a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
   );
@@ -266,26 +241,21 @@ export async function getRecentTransactions(limit: number = 5): Promise<Transact
 }
 
 export async function getCategories(): Promise<Category[]> {
-  checkMockSafety();
   return mockCategories;
 }
 
 export async function getSpendingByCategory(): Promise<SpendingByCategory[]> {
-  checkMockSafety();
   return mockSpendingByCategory;
 }
 
 export async function getMonthlyTrends(): Promise<MonthlyTrend[]> {
-  checkMockSafety();
   return mockMonthlyTrends;
 }
 
 export async function getBudgets(): Promise<Budget[]> {
-  checkMockSafety();
   return mockBudgets;
 }
 
 export async function getAnomalies(): Promise<Anomaly[]> {
-  checkMockSafety();
   return mockAnomalies;
 }

@@ -1,17 +1,33 @@
 'use server';
 
 import { requireAuth } from '@/lib/auth/guard';
-import { aiService } from '@/services/ai.service';
+import { fetchDashboardAnalytics } from './analytics.service';
+import { buildFinancialContext } from '@/lib/ai/financial-context';
+import { generateText } from 'ai';
+import { getAIProvider } from '@/lib/ai/provider';
 
 export async function sendMessageToAI(message: string) {
   await requireAuth();
   
   try {
-    return await aiService.generateInsights(message);
-  } catch (error: any) {
-    if (error?.message?.includes('No AI provider configured')) {
-      return "⚠️ No AI Provider Configured. Please configure GROQ_API_KEY in your .env.local file. See FREE_AI_SETUP.md for instructions.";
+    const context = await fetchDashboardAnalytics();
+    const systemPrompt = buildFinancialContext(context);
+    
+    const aiProvider = getAIProvider();
+    
+    if (!aiProvider) {
+      return "⚠️ No AI Provider Configured. Please configure OPENROUTER_API_KEY in your .env.local file. See FREE_AI_SETUP.md for instructions.";
     }
+
+    const { text } = await generateText({
+      model: aiProvider.model,
+      system: systemPrompt,
+      prompt: message,
+      temperature: 0.7,
+    });
+
+    return text;
+  } catch (error) {
     console.error("AI Generation Error:", error);
     return "I'm having trouble analyzing your live data right now. Please try again later.";
   }
