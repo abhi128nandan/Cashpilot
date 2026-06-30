@@ -149,6 +149,22 @@ During the production hardening of CashPilot, several architectural choices were
 
 ---
 
+## 💻 Technical Highlights
+
+- **Next.js App Router** — Leverages React Server Components and Server Actions for optimized data fetching and mutations
+- **End-to-end TypeScript** — Full type safety across the entire application stack
+- **Supabase Auth** — Secure session management with built-in JWT handling
+- **Row Level Security (RLS)** — PostgreSQL-level data isolation ensuring users can only access their own records
+- **Complex Analytics Aggregation** — Server-side SQL queries powering the financial metrics dashboard
+- **Component-driven Architecture** — Modular, reusable UI components built for maintainability
+- **Responsive UI** — Mobile-first design implemented with Tailwind CSS utility classes
+
+---
+
+## 🏷 Suggested Topics
+
+`nextjs` `typescript` `supabase` `postgresql` `personal-finance` `finance-dashboard` `tailwindcss` `full-stack` `vercel-ai-sdk` `openai`
+
 <div align="center">
   Built with ❤️ by <a href="https://github.com/abhi128nandan">abhi128nandan</a>
 </div>
