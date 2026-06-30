@@ -61,13 +61,12 @@ export default async function SettingsPage() {
               </p>
             </div>
           </div>
-          <div className={styles.divider} />
           <div className={styles.settingRow}>
             <div>
               <span className={styles.settingLabel}>AI Provider</span>
-              <span className={styles.settingDesc}>Using OpenRouter API</span>
+              <span className={styles.settingDesc}>Using Groq API</span>
             </div>
-            <span style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>mistralai/mistral-7b-instruct</span>
+            <span style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>llama-3.3-70b-versatile</span>
           </div>
         </div>
       </div>

@@ -46,17 +46,28 @@ export default function ChatInterface() {
       });
 
       if (!response.ok) {
+        let errorMsg = 'Something went wrong while generating response.';
         const errorData = await response.text().catch(() => null);
+        try {
+          if (errorData) {
+            const parsed = JSON.parse(errorData);
+            if (parsed.error) errorMsg = parsed.error;
+          }
+        } catch(e) {
+          errorMsg = errorData || errorMsg;
+        }
 
         setMessages((prev) => [
           ...prev,
           {
             id: `msg-${Date.now() + 1}`,
             role: 'assistant',
-            content: errorData || 'Something went wrong while generating response.',
+            isError: true,
+            content: errorMsg,
           },
         ]);
 
+        setError(errorMsg);
         setIsLoading(false);
         return;
       }
@@ -164,7 +175,7 @@ export default function ChatInterface() {
               key={msg.id}
               className={`${styles.message} ${
                 msg.role === 'user' ? styles.messageUser : styles.messageAssistant
-              }`}
+              } ${msg.isError ? styles.messageError : ''}`}
             >
               <div className={styles.messageAvatar}>
                 {msg.role === 'user' ? 'AM' : '🤖'}
@@ -191,13 +202,35 @@ export default function ChatInterface() {
             </div>
           )}
           {error && (
-            <div className={`${styles.message} ${styles.messageAssistant}`}>
+            <div className={`${styles.message} ${styles.messageAssistant} ${styles.messageError}`}>
               <div className={styles.messageAvatar}>⚠️</div>
               <div className={styles.messageBubble}>
                 <div className={styles.messageContent}>
-                  <p style={{ color: 'var(--color-danger-400)' }}>
-                    AI insights temporarily unavailable. Please try again later.
+                  <p style={{ color: 'var(--color-danger-400)', marginBottom: '12px' }}>
+                    <strong>AI service is temporarily unavailable.</strong><br />
+                    {typeof error === 'string' ? error : 'Provider timeout, rate limit reached, or missing API key.'}
                   </p>
+                  <p style={{ fontSize: '0.9rem', marginBottom: '8px' }}>You can try these suggested prompts when the service recovers:</p>
+                  <div className={styles.promptGrid} style={{ marginTop: '8px' }}>
+                    {[
+                      'Analyze my spending',
+                      'Explain this month\'s expenses',
+                      'Compare monthly trends',
+                      'Suggest budgeting improvements',
+                      'Where can I reduce costs?'
+                    ].map((prompt) => (
+                      <button
+                        key={prompt}
+                        className={styles.promptChip}
+                        onClick={() => {
+                          setLocalInput(prompt);
+                          inputRef.current?.focus();
+                        }}
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

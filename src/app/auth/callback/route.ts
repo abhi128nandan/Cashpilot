@@ -15,12 +15,12 @@ export async function GET(request: Request) {
       const forwardedHost = request.headers.get('x-forwarded-host') // beet: optional, check if your reverse proxy maintains this header
       const isLocalEnv = process.env.NODE_ENV === 'development'
       if (isLocalEnv) {
-        // we can be sure that origin is localhost
         return NextResponse.redirect(`${origin}${next}`)
       } else if (forwardedHost) {
         return NextResponse.redirect(`https://${forwardedHost}${next}`)
       } else {
-        return NextResponse.redirect(`${origin}${next}`)
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || origin;
+        return NextResponse.redirect(`${siteUrl}${next}`)
       }
     } else {
       // if we're here, there was an error exchanging the code

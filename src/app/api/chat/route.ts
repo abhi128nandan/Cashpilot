@@ -1,5 +1,4 @@
-import { streamText } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { aiService } from '@/services/ai.service';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -31,18 +30,16 @@ export async function POST(req: Request) {
 
     const contextData = JSON.stringify(transactions || []);
 
-    const result = streamText({
-      model: openai('gpt-4o-mini'),
-      messages,
-      system: `You are CashPilot AI, a financial assistant. You help users understand their spending, track budgets, and find anomalies.
-Here is the user's recent transaction data (last 30 transactions):
-${contextData}
-
-Answer questions specifically based on this data when relevant. Keep answers concise, helpful, and friendly.`,
-    });
+    const result = await aiService.generateChatStream(messages, contextData);
 
     return result.toTextStreamResponse();
   } catch (error: any) {
+    if (error?.message?.includes('No AI provider configured')) {
+      return NextResponse.json(
+        { error: 'No AI provider configured. Please set GROQ_API_KEY.' },
+        { status: 503 }
+      );
+    }
     console.error('AI Chat Error:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
