@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { requireAuth } from '@/lib/auth/guard';
+
 import { createClient } from '@/lib/supabase/server';
 import styles from './page.module.css';
 
@@ -51,28 +51,6 @@ export default async function SettingsPage() {
       </div>
 
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>AI Configuration</h2>
-        <div className={styles.card}>
-          <div className={styles.planRow}>
-            <div>
-              <div className={styles.planBadge} style={{ background: 'hsla(150, 80%, 40%, 0.15)', color: 'hsl(150, 80%, 50%)' }}>Connected</div>
-              <p className={styles.planDesc} style={{ marginTop: '8px' }}>
-                Your financial data is being analyzed locally and securely using free open-source models.
-              </p>
-            </div>
-          </div>
-          <div className={styles.divider} />
-          <div className={styles.settingRow}>
-            <div>
-              <span className={styles.settingLabel}>AI Provider</span>
-              <span className={styles.settingDesc}>Using OpenRouter API</span>
-            </div>
-            <span style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>mistralai/mistral-7b-instruct</span>
-          </div>
-        </div>
-      </div>
-
-      <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Preferences</h2>
         <div className={styles.card}>
           <div className={styles.settingRow}>
@@ -104,7 +82,7 @@ export default async function SettingsPage() {
           <div className={styles.settingRow}>
             <div>
               <span className={styles.settingLabel}>Anomaly Detection</span>
-              <span className={styles.settingDesc}>AI-powered alerts for unusual transactions</span>
+              <span className={styles.settingDesc}>Alerts for unusual transactions</span>
             </div>
             <label className={styles.toggle}>
               <input type="checkbox" defaultChecked />

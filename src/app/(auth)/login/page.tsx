@@ -1,14 +1,14 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { loginSchema } from '@/lib/validators/auth';
 import styles from './page.module.css';
 
 export default function LoginPage() {
-  const router = useRouter();
+  
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);

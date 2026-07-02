@@ -1,7 +1,8 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth/use-auth';
+import { useEffect, useState, useRef } from 'react';
 import styles from './header.module.css';
 
 const pageTitles: Record<string, string> = {
@@ -9,12 +10,54 @@ const pageTitles: Record<string, string> = {
   '/transactions': 'Transactions',
   '/budgets': 'Budgets',
   '/analytics': 'Analytics',
-  '/chat': 'AI Chat',
   '/settings': 'Settings',
 };
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = searchParams.get('q') || '';
+  
+  const [searchValue, setSearchValue] = useState(query);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Sync state if query param changes externally
+  useEffect(() => {
+    setSearchValue(query);
+  }, [query]);
+
+  // Shortcut key to focus search input (Cmd+K or Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchValue(val);
+    
+    const params = new URLSearchParams(window.location.search);
+    if (val) {
+      params.set('q', val);
+    } else {
+      params.delete('q');
+    }
+    
+    // Push or replace depending on whether we are already on transactions page
+    if (pathname === '/transactions') {
+      router.replace(`/transactions?${params.toString()}`, { scroll: false });
+    } else {
+      router.push(`/transactions?${params.toString()}`);
+    }
+  };
+
   const { user } = useAuth();
   const title = pageTitles[pathname] || 'CashPilot';
 
@@ -50,10 +93,13 @@ export default function Header() {
             />
           </svg>
           <input
+            ref={inputRef}
             type="text"
             className={styles.searchInput}
             placeholder="Search transactions..."
             id="global-search"
+            value={searchValue}
+            onChange={handleSearchChange}
           />
           <kbd className={styles.searchKbd}>⌘K</kbd>
         </div>

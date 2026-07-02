@@ -31,7 +31,7 @@ export default function TransactionForm({ categories, onClose }: TransactionForm
         transactionDate: date,
       });
       onClose();
-    } catch (err) {
+    } catch {
       // Error handled by hook's toast
     }
   };
@@ -62,6 +62,13 @@ export default function TransactionForm({ categories, onClose }: TransactionForm
               >
                 Income
               </button>
+              <button 
+                type="button"
+                className={`${styles.typeBtn} ${type === 'transfer' ? styles.activeTransfer : ''}`}
+                onClick={() => setType('transfer')}
+              >
+                Transfer
+              </button>
             </div>
           </div>
 
@@ -79,7 +86,7 @@ export default function TransactionForm({ categories, onClose }: TransactionForm
             />
           </div>
 
-          {type === 'income' ? (
+          {type === 'income' && (
             <div className={styles.formGroup}>
               <label>Income Source</label>
               <input 
@@ -91,7 +98,23 @@ export default function TransactionForm({ categories, onClose }: TransactionForm
                 placeholder="e.g. Salary, Freelance, Bonus"
               />
             </div>
-          ) : (
+          )}
+
+          {type === 'transfer' && (
+            <div className={styles.formGroup}>
+              <label>Destination / Description</label>
+              <input 
+                type="text" 
+                value={merchant} 
+                onChange={e => setMerchant(e.target.value)} 
+                required
+                className={styles.input}
+                placeholder="e.g. Transfer to Savings, Bank to Wallet"
+              />
+            </div>
+          )}
+
+          {type === 'expense' && (
             <>
               <div className={styles.formGroup}>
                 <label>Category</label>

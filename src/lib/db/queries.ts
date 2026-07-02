@@ -34,21 +34,10 @@ import type {
   SpendingByCategory,
   MonthlyTrend,
 } from '@/types';
-import {
-  getTransactions as getMockTransactions,
-  getRecentTransactions as getMockRecentTransactions,
-  getCategories as getMockCategories,
-  getBudgets as getMockBudgets,
-  getAnomalies as getMockAnomalies,
-  getDashboardStats as getMockDashboardStats,
-  getSpendingByCategory as getMockSpendingByCategory,
-  getMonthlyTrends as getMockMonthlyTrends,
-  mockCategories,
-} from '@/lib/mock-data';
 
 // ─── Caching & Memoization ───────────────────────────────────────────────────
 
-const ttlCache = new Map<string, { data: any; expiry: number }>();
+const ttlCache = new Map<string, { data: unknown; expiry: number }>();
 
 export function invalidateUserCache(userId: string) {
   for (const key of ttlCache.keys()) {
@@ -100,7 +89,7 @@ async function withTimeout<T>(promise: PromiseLike<T>, timeoutMs: number = 5000)
  * Unified helper for Supabase queries with timeout, retries, and structured logging.
  */
 async function executeQuery<T, R>(
-  queryFn: () => PromiseLike<{ data: T | null; error: any }>,
+  queryFn: () => PromiseLike<{ data: T | null; error: unknown }>,
   context: { 
     functionName: string; 
     userId?: string; 
@@ -112,9 +101,9 @@ async function executeQuery<T, R>(
   retries = 2,
   timeoutMs = 5000
 ): Promise<R> {
-  let requestId = await getRequestId();
+  const requestId = await getRequestId();
 
-  const logContext: Record<string, any> = { userId: context.userId };
+  const logContext: Record<string, unknown> = { userId: context.userId };
   if (requestId) logContext.requestId = requestId;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -169,7 +158,7 @@ async function executeQuery<T, R>(
       // ------------------------
 
       return context.mapFn ? context.mapFn(data as T) : (data as unknown as R);
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (querySucceeded) {
         logger.error(context.functionName, 'Failure', {
           ...logContext,
@@ -179,7 +168,7 @@ async function executeQuery<T, R>(
         return context.fallback();
       }
 
-      const errorCode = err?.code || 'UNKNOWN';
+      const errorCode = (err as { code?: string })?.code || 'UNKNOWN';
       const errorMessage = err instanceof Error ? err.message : String(err);
       
       const NON_RETRYABLE_CODES = [
@@ -339,8 +328,8 @@ export async function getTransactions(userId: string): Promise<Transaction[]> {
     {
       functionName: 'db.getTransactions',
       userId,
-      fallback: getMockTransactions,
-      mapFn: (data: any[]) => data.map(mapTransaction),
+      fallback: () => ([]),
+      mapFn: (data: Record<string, unknown>[]) => data.map(mapTransaction),
     }
   );
 }
@@ -393,7 +382,7 @@ export async function createTransaction(
       isInsert: true,
       fallback: () => ({ transaction: null } as { transaction: Transaction | null; isDuplicate?: boolean }),
       onDuplicate: input.idempotencyKey ? () => ({ transaction: null, isDuplicate: true }) : undefined,
-      mapFn: (data: any) => {
+      mapFn: (data: Record<string, unknown>) => {
         // Audit log
         logger.info('security.audit', 'Audit Log', {
           action: 'transaction_creation',
@@ -423,8 +412,8 @@ export const getCategories = reactCache(async (userId: string): Promise<Category
       {
         functionName: 'db.getCategories',
         userId,
-        fallback: getMockCategories,
-        mapFn: (data: any[]) => data.map(mapCategory),
+        fallback: () => ([]),
+        mapFn: (data: Record<string, unknown>[]) => data.map(mapCategory),
       }
     );
   });
@@ -443,8 +432,8 @@ export async function getBudgets(userId: string): Promise<Budget[]> {
     {
       functionName: 'db.getBudgets',
       userId,
-      fallback: getMockBudgets,
-      mapFn: (data: any[]) => data.map(mapBudget),
+      fallback: () => ([]),
+      mapFn: (data: Record<string, unknown>[]) => data.map(mapBudget),
     }
   );
 }
@@ -463,8 +452,8 @@ export async function getAnomalies(userId: string): Promise<Anomaly[]> {
     {
       functionName: 'db.getAnomalies',
       userId,
-      fallback: getMockAnomalies,
-      mapFn: (data: any[]) => data.map(mapAnomaly),
+      fallback: () => ([]),
+      mapFn: (data: Record<string, unknown>[]) => data.map(mapAnomaly),
     }
   );
 }
@@ -484,8 +473,8 @@ export async function getCategoryById(categoryId: string): Promise<Category | nu
       .single(),
     {
       functionName: 'db.getCategoryById',
-      fallback: () => mockCategories.find((c) => c.id === categoryId) ?? null,
-      mapFn: (data: any) => mapCategory(data),
+      fallback: () => null,
+      mapFn: (data: Record<string, unknown>) => mapCategory(data),
     }
   );
 }
@@ -512,8 +501,8 @@ export async function getRecentTransactions(
     {
       functionName: 'db.getRecentTransactions',
       userId,
-      fallback: () => getMockRecentTransactions(limit),
-      mapFn: (data: any[]) => data.map(mapTransaction),
+      fallback: () => ([]),
+      mapFn: (data: Record<string, unknown>[]) => data.map(mapTransaction),
     }
   );
 }
@@ -532,14 +521,23 @@ export const getDashboardStats = reactCache(async (userId: string): Promise<Dash
       {
         functionName: 'db.getDashboardStats',
         userId,
-        fallback: getMockDashboardStats,
-        mapFn: (data: any[]) => {
+        fallback: () => ({
+          totalIncome: 0,
+          totalExpenses: 0,
+          netBalance: 0,
+          savingsRate: 0,
+          transactionCount: 0,
+          topCategory: 'None',
+          incomeChange: 0,
+          expenseChange: 0,
+        }),
+        mapFn: (data: Record<string, unknown>[]) => {
           const totalIncome = data
-            .filter((t: any) => t.type === 'income')
-            .reduce((s: number, t: any) => s + safeNumber(t.amount), 0);
+            .filter((t: Record<string, unknown>) => t.type === 'income')
+            .reduce((s: number, t: Record<string, unknown>) => s + safeNumber(t.amount), 0);
           const totalExpenses = data
-            .filter((t: any) => t.type === 'expense')
-            .reduce((s: number, t: any) => s + safeNumber(t.amount), 0);
+            .filter((t: Record<string, unknown>) => t.type === 'expense')
+            .reduce((s: number, t: Record<string, unknown>) => s + safeNumber(t.amount), 0);
           const netBalance = totalIncome - totalExpenses;
           const savingsRate = totalIncome > 0
             ? Math.round(((totalIncome - totalExpenses) / totalIncome) * 1000) / 10
@@ -547,10 +545,10 @@ export const getDashboardStats = reactCache(async (userId: string): Promise<Dash
 
           const catTotals = new Map<string, number>();
           data
-            .filter((t: any) => t.type === 'expense')
-            .forEach((t: any) => {
-              const cat = t.category;
-              const name = cat?.name ?? 'Uncategorized';
+            .filter((t: Record<string, unknown>) => t.type === 'expense')
+            .forEach((t: Record<string, unknown>) => {
+              const cat = t.category as Record<string, unknown> | null;
+              const name = (cat?.name as string) ?? 'Uncategorized';
               catTotals.set(name, (catTotals.get(name) ?? 0) + safeNumber(t.amount));
             });
           const topCategory = [...catTotals.entries()]
@@ -587,13 +585,13 @@ export const getSpendingByCategory = reactCache(async (userId: string): Promise<
       {
         functionName: 'db.getSpendingByCategory',
         userId,
-        fallback: getMockSpendingByCategory,
-        mapFn: (data: any[]) => {
+        fallback: () => ([]),
+        mapFn: (data: Record<string, unknown>[]) => {
           const map = new Map<string, { color: string; total: number; count: number }>();
-          data.forEach((t: any) => {
-            const cat = t.category;
-            const name = cat?.name ?? 'Uncategorized';
-            const color = cat?.color ?? 'hsl(0,0%,50%)';
+          data.forEach((t: Record<string, unknown>) => {
+            const cat = t.category as Record<string, unknown> | null;
+              const name = (cat?.name as string) ?? 'Uncategorized';
+            const color = (cat?.color as string) ?? 'hsl(0,0%,50%)';
             const prev = map.get(name) ?? { color, total: 0, count: 0 };
             prev.total += safeNumber(t.amount);
             prev.count += 1;
@@ -634,13 +632,13 @@ export async function getMonthlyTrends(userId: string): Promise<MonthlyTrend[]> 
     {
       functionName: 'db.getMonthlyTrends',
       userId,
-      fallback: getMockMonthlyTrends,
-      mapFn: (data: any[]) => {
+      fallback: () => ([]),
+      mapFn: (data: Record<string, unknown>[]) => {
         const monthMap = new Map<string, { income: number; expenses: number }>();
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        data.forEach((t: any) => {
-          const d = new Date(t.transaction_date);
+        data.forEach((t: Record<string, unknown>) => {
+          const d = new Date(t.transaction_date as string);
           const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
           const prev = monthMap.get(key) ?? { income: 0, expenses: 0 };
           if (t.type === 'income') prev.income += safeNumber(t.amount);

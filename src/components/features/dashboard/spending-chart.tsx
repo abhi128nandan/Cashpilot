@@ -8,7 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
+  
 } from 'recharts';
 import type { MonthlyTrend } from '@/types';
 import { formatCurrency, formatCompactNumber } from '@/lib/utils/formatters';

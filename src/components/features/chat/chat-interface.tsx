@@ -12,16 +12,18 @@ const suggestedPrompts = [
   'How can I save more this month?',
 ];
 
+type ChatMessage = { id: string; role: 'user' | 'assistant'; content: string; };
+
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [localInput, setLocalInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<unknown>(null);
   
   const sendMessage = async (message: string) => {
     if (!message.trim()) return;
 
-    const userMessage = {
+    const userMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       role: 'user',
       content: message,
@@ -97,13 +99,13 @@ export default function ChatInterface() {
                   ? { ...msg, content: fullContent }
                   : msg
               ));
-            } catch (e) {
+            } catch {
               // Ignore parse errors for partial chunks
             }
           }
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       setError(error);
       setMessages((prev) => [
@@ -190,7 +192,7 @@ export default function ChatInterface() {
               </div>
             </div>
           )}
-          {error && (
+          {error !== null && (
             <div className={`${styles.message} ${styles.messageAssistant}`}>
               <div className={styles.messageAvatar}>⚠️</div>
               <div className={styles.messageBubble}>

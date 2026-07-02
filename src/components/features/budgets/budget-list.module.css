@@ -39,6 +39,11 @@
   color: var(--color-accent-400);
 }
 
+.overviewValueRed {
+  composes: overviewValue;
+  color: var(--color-danger-400);
+}
+
 /* Budget Cards Grid */
 .grid {
   display: grid;

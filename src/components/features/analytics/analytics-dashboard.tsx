@@ -105,28 +105,6 @@ export default function AnalyticsDashboard({ trends, spending, stats }: Props) {
           </div>
         </div>
       </div>
-
-      {/* Insights Section */}
-      <div className={styles.insights}>
-        <h3 className={styles.cardTitle}>💡 AI Insights</h3>
-        <div className={styles.insightGrid}>
-          <div className={styles.insightCard}>
-            <span className={styles.insightIcon}>📈</span>
-            <h4 className={styles.insightTitle}>Income Growing</h4>
-            <p className={styles.insightDesc}>Your income has grown 12.5% this month compared to last month. Freelance income is the primary driver.</p>
-          </div>
-          <div className={styles.insightCard}>
-            <span className={styles.insightIcon}>🎯</span>
-            <h4 className={styles.insightTitle}>Budget On Track</h4>
-            <p className={styles.insightDesc}>3 of 4 budget categories are well within limits. Shopping is at 63% — consider slowing down.</p>
-          </div>
-          <div className={styles.insightCard}>
-            <span className={styles.insightIcon}>💰</span>
-            <h4 className={styles.insightTitle}>Strong Savings</h4>
-            <p className={styles.insightDesc}>66.6% savings rate is exceptional. At this pace, you&apos;ll save over $87K this year.</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -142,6 +142,12 @@
   box-shadow: 0 0 12px hsla(160, 78%, 42%, 0.2);
 }
 
+.activeTransfer {
+  background: hsla(220, 80%, 50%, 0.15);
+  color: hsl(220, 80%, 65%);
+  box-shadow: 0 0 12px hsla(220, 80%, 50%, 0.2);
+}
+
 .footer {
   display: flex;
   justify-content: flex-end;
