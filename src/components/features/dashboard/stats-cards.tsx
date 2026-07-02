@@ -57,21 +57,6 @@ export default function StatsCards({ stats }: StatsCardsProps) {
               <span className={styles.cardIcon}>{card.icon}</span>
             </div>
             <div className={styles.cardValue}>{card.getValue(stats)}</div>
-            {change !== null && (
-              <div
-                className={`${styles.cardChange} ${
-                  change >= 0 ? styles.changePositive : styles.changeNegative
-                }`}
-              >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path
-                    d={change >= 0 ? 'M6 2L10 7H2L6 2Z' : 'M6 10L2 5H10L6 10Z'}
-                    fill="currentColor"
-                  />
-                </svg>
-                {formatPercent(Math.abs(change))} vs last month
-              </div>
-            )}
             <div
               className={styles.cardGlow}
               style={{ background: card.gradient }}

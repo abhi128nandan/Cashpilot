@@ -28,11 +28,11 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
   }
 
   const totalIncome = data
-    .filter((t: any) => t.type === 'income')
-    .reduce((s: number, t: any) => s + safeNumber(t.amount), 0);
+    .filter((t: Record<string, unknown>) => t.type === 'income')
+    .reduce((s: number, t: Record<string, unknown>) => s + safeNumber(t.amount), 0);
   const totalExpenses = data
-    .filter((t: any) => t.type === 'expense')
-    .reduce((s: number, t: any) => s + safeNumber(t.amount), 0);
+    .filter((t: Record<string, unknown>) => t.type === 'expense')
+    .reduce((s: number, t: Record<string, unknown>) => s + safeNumber(t.amount), 0);
   const netBalance = totalIncome - totalExpenses;
   const savingsRate = totalIncome > 0
     ? Math.round(((totalIncome - totalExpenses) / totalIncome) * 1000) / 10
@@ -40,11 +40,11 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
 
   const catTotals = new Map<string, number>();
   data
-    .filter((t: any) => t.type === 'expense')
-    .forEach((t: any) => {
-      const cat = t.category;
-      const name = cat?.name ?? 'Uncategorized';
-      catTotals.set(name, (catTotals.get(name) ?? 0) + safeNumber(t.amount));
+    .filter((t: Record<string, unknown>) => t.type === 'expense')
+    .forEach((t: Record<string, unknown>) => {
+      const cat = t.category as Record<string, unknown> | null;
+      const name = (cat?.name as string) ?? 'Uncategorized';
+      catTotals.set(name as string, (catTotals.get(name as string) ?? 0) + safeNumber(t.amount));
     });
   const topCategory = [...catTotals.entries()]
     .sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'None';
@@ -75,10 +75,10 @@ export async function getSpendingByCategory(userId: string): Promise<SpendingByC
   }
 
   const map = new Map<string, { color: string; total: number; count: number }>();
-  data.forEach((t: any) => {
-    const cat = t.category;
-    const name = cat?.name ?? 'Uncategorized';
-    const color = cat?.color ?? 'hsl(0,0%,50%)';
+  data.forEach((t: Record<string, unknown>) => {
+    const cat = t.category as Record<string, unknown> | null;
+      const name = (cat?.name as string) ?? 'Uncategorized';
+    const color = (cat?.color as string) ?? 'hsl(0,0%,50%)';
     const prev = map.get(name) ?? { color, total: 0, count: 0 };
     prev.total += safeNumber(t.amount);
     prev.count += 1;
@@ -117,8 +117,8 @@ export async function getMonthlyTrends(userId: string): Promise<MonthlyTrend[]> 
   const monthMap = new Map<string, { income: number; expenses: number }>();
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  data.forEach((t: any) => {
-    const d = new Date(t.transaction_date);
+  data.forEach((t: Record<string, unknown>) => {
+    const d = new Date(t.transaction_date as string);
     const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
     const prev = monthMap.get(key) ?? { income: 0, expenses: 0 };
     if (t.type === 'income') prev.income += safeNumber(t.amount);

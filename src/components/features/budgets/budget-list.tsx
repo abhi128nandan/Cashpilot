@@ -31,7 +31,9 @@ export default function BudgetList({ budgets, categories }: BudgetListProps) {
         </div>
         <div className={styles.overviewCard}>
           <span className={styles.overviewLabel}>Remaining</span>
-          <span className={styles.overviewValueGreen}>{formatCurrency(totalBudget - totalSpent)}</span>
+          <span className={totalBudget - totalSpent >= 0 ? styles.overviewValueGreen : styles.overviewValueRed}>
+            {formatCurrency(totalBudget - totalSpent)}
+          </span>
         </div>
         <div className={styles.overviewCard}>
           <span className={styles.overviewLabel}>Utilization</span>

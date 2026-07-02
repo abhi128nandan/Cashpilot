@@ -42,7 +42,7 @@ Answer questions specifically based on this data when relevant. Keep answers con
     });
 
     return result.toTextStreamResponse();
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('AI Chat Error:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }

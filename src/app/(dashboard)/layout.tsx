@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Sidebar from '@/components/layout/sidebar';
 import Header from '@/components/layout/header';
 import styles from './layout.module.css';
@@ -14,8 +15,14 @@ export default async function DashboardLayout({
     <div className={styles.layoutWrapper}>
       <Sidebar />
       <div className={styles.mainArea}>
-        <Header />
-        <main className={styles.content}>{children}</main>
+        <Suspense fallback={null}>
+          <Header />
+        </Suspense>
+        <main className={styles.content}>
+          <Suspense fallback={null}>
+            {children}
+          </Suspense>
+        </main>
       </div>
     </div>
   );

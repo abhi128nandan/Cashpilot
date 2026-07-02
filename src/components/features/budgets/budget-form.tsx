@@ -25,7 +25,7 @@ export default function BudgetForm({ categories, onClose }: BudgetFormProps) {
         categoryId,
       });
       onClose();
-    } catch (err) {
+    } catch {
       // Handled by toast
     }
   };
@@ -72,7 +72,7 @@ export default function BudgetForm({ categories, onClose }: BudgetFormProps) {
             <label>Period</label>
             <select 
               value={period} 
-              onChange={e => setPeriod(e.target.value as any)}
+              onChange={e => setPeriod(e.target.value as 'weekly' | 'monthly' | 'yearly')}
               className={styles.input}
               required
             >

@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/auth/guard';
 import { fetchDashboardAnalytics } from './analytics.service';
 import { buildFinancialContext } from '@/lib/ai/financial-context';
 import { generateText } from 'ai';
-import { getAIProvider } from '@/lib/ai/provider';
+import { openai } from '@ai-sdk/openai';
 
 export async function sendMessageToAI(message: string) {
   await requireAuth();
@@ -13,14 +13,12 @@ export async function sendMessageToAI(message: string) {
     const context = await fetchDashboardAnalytics();
     const systemPrompt = buildFinancialContext(context);
     
-    const aiProvider = getAIProvider();
-    
-    if (!aiProvider) {
-      return "⚠️ No AI Provider Configured. Please configure OPENROUTER_API_KEY in your .env.local file. See FREE_AI_SETUP.md for instructions.";
+    if (!process.env.OPENAI_API_KEY) {
+      return "⚠️ No AI Provider Configured. Please configure OPENAI_API_KEY in your .env.local file.";
     }
 
     const { text } = await generateText({
-      model: aiProvider.model,
+      model: openai('gpt-4o-mini'),
       system: systemPrompt,
       prompt: message,
       temperature: 0.7,

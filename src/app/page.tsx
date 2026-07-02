@@ -8,11 +8,6 @@ const features = [
     desc: 'Track income, expenses, and net savings with beautiful interactive charts and live category breakdowns.',
   },
   {
-    icon: '🤖',
-    title: 'AI-Powered Insights',
-    desc: 'Ask questions in natural language. Our RAG pipeline analyzes your actual transaction history for accurate answers.',
-  },
-  {
     icon: '⚠️',
     title: 'Anomaly Detection',
     desc: 'Automatically flag unusual transactions, subscription creep, and potential fraud with intelligent pattern analysis.',
@@ -25,7 +20,7 @@ const features = [
   {
     icon: '📈',
     title: 'Cash Flow Forecast',
-    desc: 'Predict future expenses and income trends using AI-driven analysis of your historical spending patterns.',
+    desc: 'Predict future expenses and income trends using historical spending patterns.',
   },
   {
     icon: '🔒',
@@ -61,17 +56,13 @@ export default function LandingPage() {
       <section className={styles.hero} id="hero">
         <div className={styles.heroGlow} />
         <div className={styles.heroContent}>
-          <div className={styles.heroBadge}>
-            <span className={styles.heroBadgeDot} />
-            Powered by GPT-4o + RAG Pipeline
-          </div>
           <h1 className={styles.heroTitle}>
             Your finances,{' '}
-            <span className="text-gradient">understood by AI.</span>
+            <span className="text-gradient">simplified.</span>
           </h1>
           <p className={styles.heroDesc}>
-            CashPilot is an AI-powered financial intelligence platform that tracks your spending,
-            detects anomalies, forecasts cash flow, and answers your questions in natural language —
+            CashPilot is a modern financial intelligence platform that tracks your spending,
+            detects anomalies, forecasts cash flow, and helps you master your money —
             all grounded in your real transaction data.
           </p>
           <div className={styles.heroCtas}>
@@ -82,22 +73,6 @@ export default function LandingPage() {
               See Features
             </a>
           </div>
-          <div className={styles.heroStats}>
-            <div className={styles.heroStat}>
-              <span className={styles.heroStatValue}>₹20Cr+</span>
-              <span className={styles.heroStatLabel}>Tracked</span>
-            </div>
-            <div className={styles.heroStatDivider} />
-            <div className={styles.heroStat}>
-              <span className={styles.heroStatValue}>15K+</span>
-              <span className={styles.heroStatLabel}>Transactions</span>
-            </div>
-            <div className={styles.heroStatDivider} />
-            <div className={styles.heroStat}>
-              <span className={styles.heroStatValue}>99.9%</span>
-              <span className={styles.heroStatLabel}>Uptime</span>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -106,7 +81,7 @@ export default function LandingPage() {
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Everything you need to master your money</h2>
           <p className={styles.sectionDesc}>
-            Production-grade financial intelligence with AI at its core.
+            Production-grade financial intelligence.
           </p>
         </div>
         <div className={styles.featureGrid}>
@@ -127,14 +102,14 @@ export default function LandingPage() {
         <div className={styles.footerInner}>
           <div className={styles.footerBrand}>
             <span className={styles.footerLogo}>CashPilot</span>
-            <p className={styles.footerDesc}>AI-powered financial intelligence for everyone.</p>
+            <p className={styles.footerDesc}>Modern financial intelligence for everyone.</p>
           </div>
           <div className={styles.footerLinks}>
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
             <a href="#">GitHub</a>
           </div>
-          <p className={styles.footerCopy}>© 2024 CashPilot. Built with Next.js, Supabase, and OpenAI.</p>
+          <p className={styles.footerCopy}>© 2025 CashPilot. Built with Next.js and Supabase.</p>
         </div>
       </footer>
     </div>

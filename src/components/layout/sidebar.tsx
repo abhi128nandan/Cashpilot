@@ -13,7 +13,6 @@ const navItems = [
   { href: '/transactions', label: 'Transactions', icon: '💳' },
   { href: '/budgets', label: 'Budgets', icon: '🎯' },
   { href: '/analytics', label: 'Analytics', icon: '📈' },
-  { href: '/chat', label: 'AI Chat', icon: '🤖' },
 ];
 
 const bottomItems = [

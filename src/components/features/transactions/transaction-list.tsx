@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import type { Transaction, Category, TransactionType } from '@/types';
-import { formatCurrency, formatDate } from '@/lib/utils/formatters';
+import { formatCurrency, formatDate, formatTransactionDateTime } from '@/lib/utils/formatters';
 import { useTransactions } from '@/hooks/use-transactions';
 import { toast } from 'sonner';
 import { Trash2 } from 'lucide-react';
@@ -20,18 +21,75 @@ export default function TransactionList({
   categories,
 }: TransactionListProps) {
   const { deleteTransaction, isDeleting } = useTransactions();
-  const [search, setSearch] = useState('');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = searchParams.get('q') || '';
+
+  const [search, setSearch] = useState(query);
   const [typeFilter, setTypeFilter] = useState<TransactionType | 'all'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [monthFilter, setMonthFilter] = useState<string>('all');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [showForm, setShowForm] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const monthOptions = useMemo(() => {
+    const dateMap = new Map<string, Date>();
+    
+    // Always inject the current month
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonthStr = now.toLocaleString('default', { month: 'long' });
+    const currentKey = `${currentMonthStr} ${currentYear}`;
+    dateMap.set(currentKey, new Date(currentYear, now.getMonth(), 1));
+
+    transactions.forEach((t) => {
+      const date = new Date(t.transactionDate);
+      if (!isNaN(date.getTime())) {
+        const year = date.getFullYear();
+        const monthStr = date.toLocaleString('default', { month: 'long' });
+        const key = `${monthStr} ${year}`;
+        if (!dateMap.has(key)) {
+          dateMap.set(key, new Date(year, date.getMonth(), 1));
+        }
+      }
+    });
+    return Array.from(dateMap.entries())
+      .sort((a, b) => b[1].getTime() - a[1].getTime())
+      .map(([key]) => key);
+  }, [transactions]);
+
+  // Sync state if query param changes externally (e.g. from Header search)
+  useEffect(() => {
+    setSearch(query);
+  }, [query]);
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    const params = new URLSearchParams(window.location.search);
+    if (value) {
+      params.set('q', value);
+    } else {
+      params.delete('q');
+    }
+    router.replace(`/transactions?${params.toString()}`, { scroll: false });
+  };
+
+  const handleClearFilters = () => {
+    setSearch('');
+    setTypeFilter('all');
+    setCategoryFilter('all');
+    setMonthFilter('all');
+    const params = new URLSearchParams(window.location.search);
+    params.delete('q');
+    router.replace(`/transactions?${params.toString()}`, { scroll: false });
+  };
 
   const handleDelete = async (id: string) => {
     try {
       await deleteTransaction(id);
       setDeletingId(null);
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete transaction. Please try again.');
     }
   };
@@ -42,7 +100,7 @@ export default function TransactionList({
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
-        (t) =>
+         (t) =>
           t.merchant?.toLowerCase().includes(q) ||
           t.description?.toLowerCase().includes(q)
       );
@@ -56,14 +114,29 @@ export default function TransactionList({
       result = result.filter((t) => t.categoryId === categoryFilter);
     }
 
+    if (monthFilter !== 'all') {
+      result = result.filter((t) => {
+        const date = new Date(t.transactionDate);
+        if (isNaN(date.getTime())) return false;
+        const year = date.getFullYear();
+        const monthStr = date.toLocaleString('default', { month: 'long' });
+        return `${monthStr} ${year}` === monthFilter;
+      });
+    }
+
     result.sort((a, b) => {
       const dateA = new Date(a.transactionDate).getTime();
       const dateB = new Date(b.transactionDate).getTime();
-      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+      if (dateA !== dateB) {
+        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+      }
+      const timeA = new Date(a.createdAt).getTime();
+      const timeB = new Date(b.createdAt).getTime();
+      return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
     });
 
     return result;
-  }, [transactions, search, typeFilter, categoryFilter, sortOrder]);
+  }, [transactions, search, typeFilter, categoryFilter, monthFilter, sortOrder]);
 
   const totalIncome = filtered
     .filter((t) => t.type === 'income')
@@ -71,6 +144,8 @@ export default function TransactionList({
   const totalExpenses = filtered
     .filter((t) => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
+
+  const isFiltered = !!(search || typeFilter !== 'all' || categoryFilter !== 'all' || monthFilter !== 'all');
 
   return (
     <div className={styles.container} id="transactions-page">
@@ -119,7 +194,7 @@ export default function TransactionList({
             type="text"
             placeholder="Search by merchant or description..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className={styles.searchInput}
             id="transaction-search"
           />
@@ -151,6 +226,20 @@ export default function TransactionList({
           ))}
         </select>
 
+        <select
+          value={monthFilter}
+          onChange={(e) => setMonthFilter(e.target.value)}
+          className={styles.filterSelect}
+          id="month-filter"
+        >
+          <option value="all">All Months</option>
+          {monthOptions.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+
         <button
           onClick={() => setSortOrder((o) => (o === 'desc' ? 'asc' : 'desc'))}
           className={styles.sortBtn}
@@ -158,6 +247,16 @@ export default function TransactionList({
         >
           {sortOrder === 'desc' ? '↓ Newest' : '↑ Oldest'}
         </button>
+
+        {isFiltered && (
+          <button
+            onClick={handleClearFilters}
+            className={styles.clearBtn}
+            id="clear-filters"
+          >
+            Clear Filters
+          </button>
+        )}
 
         <button
           onClick={() => setShowForm(true)}
@@ -188,14 +287,18 @@ export default function TransactionList({
               >
                 <td className={styles.td}>
                   <div className={styles.merchantCell}>
-                    <span
-                      className={styles.catDot}
-                      style={{
-                        background: txn.type === 'income' 
-                          ? 'hsl(160, 78%, 52%)' 
-                          : (txn.category?.color || 'var(--color-text-tertiary)'),
-                      }}
-                    />
+                    {txn.type === 'transfer' ? (
+                      <span className={styles.transferIcon} title="Transfer">⇄</span>
+                    ) : (
+                      <span
+                        className={styles.catDot}
+                        style={{
+                          background: txn.type === 'income' 
+                            ? 'hsl(160, 78%, 52%)' 
+                            : (txn.category?.color || 'var(--color-text-tertiary)'),
+                        }}
+                      />
+                    )}
                     <div>
                       <span className={styles.merchantName}>
                         {txn.merchant || txn.description || txn.category?.name || 'Transaction'}
@@ -212,7 +315,7 @@ export default function TransactionList({
                   </span>
                 </td>
                 <td className={styles.td}>
-                  <span className={styles.dateText}>{formatDate(txn.transactionDate)}</span>
+                  <span className={styles.dateText}>{formatTransactionDateTime(txn.transactionDate, txn.createdAt)}</span>
                 </td>
                 <td className={styles.td}>
                   <span
@@ -254,7 +357,20 @@ export default function TransactionList({
         </table>
         {filtered.length === 0 && (
           <div className={styles.emptyState}>
-            <p>No transactions found matching your filters.</p>
+            <div className={styles.emptyIcon}>🔍</div>
+            <h4 className={styles.emptyTitle}>No transactions found</h4>
+            <p className={styles.emptyDesc}>
+              We couldn&apos;t find any transactions matching your current filters. Try adjusting your search query or dropdown selections.
+            </p>
+            {isFiltered && (
+              <button
+                onClick={handleClearFilters}
+                className={styles.emptyResetBtn}
+                id="reset-filters-empty"
+              >
+                Reset All Filters
+              </button>
+            )}
           </div>
         )}
       </div>

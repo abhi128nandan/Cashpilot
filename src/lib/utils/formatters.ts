@@ -5,7 +5,7 @@ import { safeNumber } from '@/lib/math';
 /**
  * Format a currency amount with locale-aware formatting (INR).
  */
-export function formatCurrency(amount: number | null | undefined, _currency?: string, _locale?: string): string {
+export function formatCurrency(amount: number | null | undefined, ): string {
   const num = safeNumber(amount);
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -46,6 +46,24 @@ export function formatDate(dateStr: string): string {
   if (isYesterday(date)) return 'Yesterday';
 
   return format(date, 'MMM d, yyyy');
+}
+
+/**
+ * Format a transaction date and entry time in a human-readable way
+ */
+export function formatTransactionDateTime(dateStr: string, createdAtStr: string): string {
+  try {
+    const date = typeof dateStr === 'string' ? parseISO(dateStr) : dateStr;
+    const createdTime = typeof createdAtStr === 'string' ? parseISO(createdAtStr) : createdAtStr;
+    const timeFormatted = format(createdTime, 'h:mm a');
+
+    if (isToday(date)) return `Today at ${timeFormatted}`;
+    if (isYesterday(date)) return `Yesterday at ${timeFormatted}`;
+
+    return `${format(date, 'MMM d, yyyy')} at ${timeFormatted}`;
+  } catch {
+    return formatDate(dateStr);
+  }
 }
 
 /**

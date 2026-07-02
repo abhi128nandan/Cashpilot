@@ -52,7 +52,6 @@ export async function updateSession(request: NextRequest) {
     '/transactions',
     '/budgets',
     '/analytics',
-    '/chat',
     '/settings',
   ]
 
