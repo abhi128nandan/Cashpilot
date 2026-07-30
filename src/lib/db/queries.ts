@@ -729,6 +729,36 @@ export async function getRecurringTransactionById(id: string, userId: string): P
   );
 }
 
+export async function getDueRecurringTransactions(userId?: string): Promise<RecurringTransaction[]> {
+  // Use admin client to bypass RLS if running as a system cron job
+  const { createAdminClient } = await import('@/lib/supabase/server');
+  const supabase = createAdminClient();
+  
+  const today = new Date().toISOString().split('T')[0];
+  
+  return executeQuery(
+    () => {
+      let query = supabase
+        .from('recurring_transactions')
+        .select('*, category:categories(*)')
+        .eq('status', 'active')
+        .lte('next_date', today)
+        .order('next_date', { ascending: true });
+        
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+      
+      return query;
+    },
+    {
+      functionName: 'db.getDueRecurringTransactions',
+      fallback: () => ([]),
+      mapFn: (data: Record<string, unknown>[]) => data.map(mapRecurringTransaction),
+    }
+  );
+}
+
 export async function createRecurringTransactionRule(
   userId: string,
   input: {
@@ -819,6 +849,40 @@ export async function updateRecurringTransactionRule(
     {
       functionName: 'db.updateRecurringTransactionRule',
       userId,
+      fallback: () => null,
+      mapFn: (data: Record<string, unknown>) => mapRecurringTransaction(data),
+    }
+  );
+}
+
+export async function updateRecurringTransactionAdmin(
+  id: string,
+  updates: {
+    nextDate?: string;
+    lastProcessedAt?: string;
+    status?: string;
+  }
+): Promise<RecurringTransaction | null> {
+  const { createAdminClient } = await import('@/lib/supabase/server');
+  const supabase = createAdminClient();
+  
+  const payload: Record<string, unknown> = {
+    updated_at: new Date().toISOString()
+  };
+  
+  if (updates.nextDate !== undefined) payload.next_date = updates.nextDate;
+  if (updates.lastProcessedAt !== undefined) payload.last_processed_at = updates.lastProcessedAt;
+  if (updates.status !== undefined) payload.status = updates.status;
+
+  return executeQuery(
+    () => supabase
+      .from('recurring_transactions')
+      .update(payload)
+      .eq('id', id)
+      .select('*, category:categories(*)')
+      .single(),
+    {
+      functionName: 'db.updateRecurringTransactionAdmin',
       fallback: () => null,
       mapFn: (data: Record<string, unknown>) => mapRecurringTransaction(data),
     }
