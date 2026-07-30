@@ -34,6 +34,13 @@ export const createRecurringSchema = baseRecurringSchema.superRefine((data, ctx)
   const start = new Date(data.startDate);
   start.setHours(0, 0, 0, 0);
   
+  const next = new Date(data.nextDate);
+  next.setHours(0, 0, 0, 0);
+  
+  if (next < start) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Next date must be on or after start date", path: ["nextDate"] });
+  }
+  
   if (data.endDate) {
     const end = new Date(data.endDate);
     end.setHours(0, 0, 0, 0);
@@ -47,16 +54,6 @@ export type CreateRecurringInput = z.infer<typeof createRecurringSchema>;
 
 export const updateRecurringSchema = baseRecurringSchema.partial().extend({
   status: recurringStatusEnum.optional(),
-}).superRefine((data, ctx) => {
-  if (data.startDate && data.endDate) {
-    const start = new Date(data.startDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(data.endDate);
-    end.setHours(0, 0, 0, 0);
-    if (end <= start) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "End date must be after start date", path: ["endDate"] });
-    }
-  }
 });
 
 export type UpdateRecurringInput = z.infer<typeof updateRecurringSchema>;

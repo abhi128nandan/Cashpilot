@@ -89,19 +89,38 @@ export async function updateRecurringTransaction(id: string, input: UpdateRecurr
   try {
     const user = await requireAuth();
     
-    // Validate ownership before updating
+    // Validate basic types of incoming payload
+    const partialParse = updateRecurringSchema.safeParse(input);
+    if (!partialParse.success) {
+      throw new ValidationError(partialParse.error.flatten().fieldErrors);
+    }
+    
+    const validatedData = partialParse.data;
+
+    // Fetch existing record to merge and validate cross-field business rules
     const existing = await dbGetRecurringTransactionById(id, user.id);
     if (!existing) {
       throw new NotFoundError('Recurring transaction');
     }
     
-    const parseResult = updateRecurringSchema.safeParse(input);
-    if (!parseResult.success) {
-      const fieldErrors = parseResult.error.flatten().fieldErrors;
-      throw new ValidationError(fieldErrors);
+    // Merge existing and updates for strict validation
+    const mergedForValidation = {
+      amount: validatedData.amount ?? existing.amount,
+      type: validatedData.type ?? existing.type,
+      currency: validatedData.currency ?? existing.currency,
+      merchant: validatedData.merchant !== undefined ? validatedData.merchant ?? undefined : existing.merchant ?? undefined,
+      description: validatedData.description !== undefined ? validatedData.description ?? undefined : existing.description ?? undefined,
+      categoryId: validatedData.categoryId !== undefined ? (validatedData.categoryId === null ? '' : validatedData.categoryId) : existing.categoryId ?? '',
+      frequency: validatedData.frequency ?? existing.frequency,
+      startDate: validatedData.startDate ?? new Date(existing.startDate),
+      nextDate: validatedData.nextDate ?? new Date(existing.nextDate),
+      endDate: validatedData.endDate !== undefined ? validatedData.endDate : (existing.endDate ? new Date(existing.endDate) : null),
+    };
+
+    const strictParse = createRecurringSchema.safeParse(mergedForValidation);
+    if (!strictParse.success) {
+      throw new ValidationError(strictParse.error.flatten().fieldErrors);
     }
-    
-    const validatedData = parseResult.data;
     
     const result = await updateRecurringTransactionRule(id, user.id, {
       amount: validatedData.amount,
@@ -118,7 +137,7 @@ export async function updateRecurringTransaction(id: string, input: UpdateRecurr
     });
     
     if (!result) {
-      throw new AppError('Failed to update recurring transaction', 500);
+      throw new NotFoundError('Recurring transaction');
     }
     
     invalidateUserCache(user.id);
@@ -135,15 +154,9 @@ export async function archiveRecurringTransaction(id: string): Promise<ActionRes
   try {
     const user = await requireAuth();
     
-    // Ensure ownership exists before archiving
-    const existing = await dbGetRecurringTransactionById(id, user.id);
-    if (!existing) {
-      throw new NotFoundError('Recurring transaction');
-    }
-    
     const success = await archiveRecurringTransactionRule(id, user.id);
     if (!success) {
-      throw new AppError('Failed to archive recurring transaction', 500);
+      throw new NotFoundError('Recurring transaction');
     }
     
     invalidateUserCache(user.id);
@@ -155,3 +168,4 @@ export async function archiveRecurringTransaction(id: string): Promise<ActionRes
     return { success: false, error: err.message };
   }
 }
+
