@@ -3,18 +3,20 @@ import styles from './recurring.module.css';
 import type { RecurringTransaction } from '@/types';
 import { formatCurrency, formatTransactionDateTime } from '@/lib/utils/formatters';
 import { RecurringStatusBadge } from './recurring-status-badge';
-import { Edit2, Archive } from 'lucide-react';
+import { Edit2, Archive, Play, Pause } from 'lucide-react';
 
 interface RecurringTransactionCardProps {
   transaction: RecurringTransaction;
   onEdit?: (transaction: RecurringTransaction) => void;
   onArchive?: (id: string) => void;
+  onToggleStatus?: (id: string, currentStatus: string) => void;
 }
 
 export function RecurringTransactionCard({ 
   transaction, 
   onEdit, 
-  onArchive 
+  onArchive,
+  onToggleStatus
 }: RecurringTransactionCardProps) {
   const isIncome = transaction.type === 'income';
   
@@ -56,7 +58,7 @@ export function RecurringTransactionCard({
       </div>
 
       <div className={styles.cardActions}>
-        {onEdit && (
+        {onEdit && transaction.status !== 'archived' && (
           <button 
             type="button"
             className={styles.iconBtn} 
@@ -64,6 +66,20 @@ export function RecurringTransactionCard({
             aria-label="Edit recurring transaction"
           >
             <Edit2 size={14} /> Edit
+          </button>
+        )}
+        {onToggleStatus && transaction.status !== 'archived' && (
+          <button 
+            type="button"
+            className={styles.iconBtn} 
+            onClick={() => onToggleStatus(transaction.id, transaction.status)}
+            aria-label={transaction.status === 'active' ? "Pause recurring transaction" : "Resume recurring transaction"}
+          >
+            {transaction.status === 'active' ? (
+              <><Pause size={14} /> Pause</>
+            ) : (
+              <><Play size={14} /> Resume</>
+            )}
           </button>
         )}
         {onArchive && transaction.status !== 'archived' && (

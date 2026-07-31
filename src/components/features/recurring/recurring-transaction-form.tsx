@@ -6,7 +6,13 @@ import { RecurringFrequencySelector } from './recurring-frequency-selector';
 import styles from './recurring.module.css';
 
 interface RecurringTransactionFormProps {
-  initialData?: Partial<CreateRecurringInput> & { id?: string; status?: RecurringStatus };
+  initialData?: Partial<Omit<CreateRecurringInput, 'startDate' | 'nextDate' | 'endDate'>> & { 
+    id?: string; 
+    status?: RecurringStatus;
+    startDate?: Date | string;
+    nextDate?: Date | string;
+    endDate?: Date | string | null;
+  };
   categories: Category[];
   onSubmit: (data: CreateRecurringInput | UpdateRecurringInput) => Promise<void>;
   isPending: boolean;

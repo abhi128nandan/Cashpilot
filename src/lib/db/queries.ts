@@ -38,6 +38,8 @@ import type {
 
 // ─── Caching & Memoization ───────────────────────────────────────────────────
 
+import { AIContextCache } from '@/lib/cache/ai-cache';
+
 const ttlCache = new Map<string, { data: unknown; expiry: number }>();
 
 export function invalidateUserCache(userId: string) {
@@ -46,6 +48,9 @@ export function invalidateUserCache(userId: string) {
       ttlCache.delete(key);
     }
   }
+  
+  // Also invalidate AI Session Context Cache to prevent hallucinations on stale data
+  AIContextCache.invalidate(userId);
 }
 
 async function withTtlCache<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise<T> {

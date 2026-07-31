@@ -21,18 +21,18 @@ export class RecurringProcessingEngine {
   /**
    * Process all currently due recurring transactions across all users.
    */
-  static async processAll(): Promise<ProcessingResult> {
-    return this.executeProcessing();
+  static async processAll(requestId?: string): Promise<ProcessingResult> {
+    return this.executeProcessing(undefined, requestId);
   }
 
   /**
    * Process due recurring transactions for a specific user.
    */
-  static async processForUser(userId: string): Promise<ProcessingResult> {
-    return this.executeProcessing(userId);
+  static async processForUser(userId: string, requestId?: string): Promise<ProcessingResult> {
+    return this.executeProcessing(userId, requestId);
   }
 
-  private static async executeProcessing(userId?: string): Promise<ProcessingResult> {
+  private static async executeProcessing(userId?: string, requestId?: string): Promise<ProcessingResult> {
     const result: ProcessingResult = {
       processedCount: 0,
       generatedCount: 0,
@@ -41,7 +41,7 @@ export class RecurringProcessingEngine {
       errors: [],
     };
 
-    logger.info('recurring_engine', 'Starting processing batch', { userId });
+    logger.info('recurring_engine', 'Starting processing batch', { userId, requestId });
     const startTime = Date.now();
 
     try {
@@ -65,19 +65,22 @@ export class RecurringProcessingEngine {
           
           logger.error('recurring_engine', 'Rule processing failed', {
             ruleId: rule.id,
-            error: errorMessage
+            error: errorMessage,
+            requestId
           });
         }
       }
 
       logger.info('recurring_engine', 'Completed processing batch', {
         durationMs: Date.now() - startTime,
+        requestId,
         ...result
       });
 
     } catch (error) {
       logger.error('recurring_engine', 'Fatal error during processing execution', {
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
+        requestId
       });
       throw error;
     }
