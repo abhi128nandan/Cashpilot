@@ -31,3 +31,19 @@ export async function createClient() {
     }
   )
 }
+
+export function createAdminClient() {
+  const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY // fallback to anon if service key missing locally
+  
+  return createServerClient(
+    supabaseUrl,
+    supabaseServiceKey,
+    {
+      cookies: {
+        getAll() { return [] },
+        setAll() {}
+      }
+    }
+  )
+}

@@ -1,0 +1,373 @@
+/* Dialog and Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: hsla(228, 20%, 8%, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: hsla(228, 20%, 16%, 0.95);
+  border: 1px solid hsla(228, 20%, 40%, 0.2);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 48px hsla(228, 20%, 5%, 0.5);
+  overflow: hidden;
+  animation: modalEnter 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid hsla(228, 20%, 40%, 0.1);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-tertiary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  background: hsla(228, 20%, 30%, 0.5);
+  color: var(--color-text-primary);
+}
+
+/* Form Styles */
+.form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: hsla(228, 20%, 40%, 0.3) transparent;
+}
+
+.form::-webkit-scrollbar {
+  width: 6px;
+}
+.form::-webkit-scrollbar-thumb {
+  background-color: hsla(228, 20%, 40%, 0.3);
+  border-radius: 6px;
+}
+
+.formRow {
+  display: flex;
+  gap: 16px;
+}
+.formRow > * {
+  flex: 1;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.input {
+  background: hsla(228, 20%, 10%, 0.5);
+  border: 1px solid hsla(228, 20%, 40%, 0.3);
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+}
+
+.input[aria-invalid="true"] {
+  border-color: hsl(0, 78%, 54%);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.errorText {
+  color: hsl(0, 78%, 64%);
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+/* Selectors */
+.typeSelector, .frequencySelector {
+  display: flex;
+  background: hsla(228, 20%, 10%, 0.5);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.typeBtn, .freqBtn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.typeBtn:disabled, .freqBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.activeExpense {
+  background: hsla(0, 78%, 54%, 0.15);
+  color: hsl(0, 78%, 64%);
+  box-shadow: 0 0 12px hsla(0, 78%, 54%, 0.2);
+}
+
+.activeIncome {
+  background: hsla(160, 78%, 42%, 0.15);
+  color: hsl(160, 78%, 52%);
+  box-shadow: 0 0 12px hsla(160, 78%, 42%, 0.2);
+}
+
+.activeTransfer {
+  background: hsla(220, 80%, 50%, 0.15);
+  color: hsl(220, 80%, 65%);
+  box-shadow: 0 0 12px hsla(220, 80%, 50%, 0.2);
+}
+
+.activeFreq {
+  background: hsla(228, 80%, 60%, 0.15);
+  color: var(--color-accent);
+  box-shadow: 0 0 12px hsla(228, 80%, 60%, 0.2);
+}
+
+/* Footer Buttons */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.cancelBtn {
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid hsla(228, 20%, 40%, 0.3);
+  color: var(--color-text-secondary);
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: hsla(228, 20%, 30%, 0.3);
+  color: var(--color-text-primary);
+}
+
+.cancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitBtn {
+  padding: 10px 24px;
+  background: var(--gradient-accent);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badgeActive {
+  background: hsla(160, 78%, 42%, 0.15);
+  color: hsl(160, 78%, 52%);
+  border: 1px solid hsla(160, 78%, 42%, 0.3);
+}
+
+.badgePaused {
+  background: hsla(40, 90%, 50%, 0.15);
+  color: hsl(40, 90%, 60%);
+  border: 1px solid hsla(40, 90%, 50%, 0.3);
+}
+
+.badgeArchived {
+  background: hsla(228, 20%, 30%, 0.3);
+  color: var(--color-text-secondary);
+  border: 1px solid hsla(228, 20%, 40%, 0.3);
+}
+
+/* Card */
+.card {
+  background: hsla(228, 20%, 12%, 0.5);
+  border: 1px solid hsla(228, 20%, 30%, 0.4);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  background: hsla(228, 20%, 14%, 0.6);
+  border-color: hsla(228, 20%, 40%, 0.6);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.cardTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardMerchant {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 1.1rem;
+}
+
+.cardAmount {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.amountIncome {
+  color: hsl(160, 78%, 52%);
+}
+
+.amountExpense {
+  color: hsl(0, 78%, 64%);
+}
+
+.amountTransfer {
+  color: var(--color-text-primary);
+}
+
+.cardDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.cardDetailItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: hsla(228, 20%, 20%, 0.4);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.cardActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid hsla(228, 20%, 30%, 0.3);
+}
+
+.iconBtn {
+  background: transparent;
+  border: 1px solid hsla(228, 20%, 40%, 0.3);
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.iconBtn:hover {
+  background: hsla(228, 20%, 30%, 0.5);
+  color: var(--color-text-primary);
+}
+
+.iconBtnArchived {
+  color: hsl(0, 78%, 64%);
+  border-color: hsla(0, 78%, 54%, 0.3);
+}
+
+.iconBtnArchived:hover {
+  background: hsla(0, 78%, 54%, 0.15);
+  color: hsl(0, 78%, 64%);
+}

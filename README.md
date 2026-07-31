@@ -115,7 +115,7 @@ graph TD
 - [x] **Phase 1: Core Ledger & Budgets** — Manual transaction inputs, category badges, dynamic limits.
 - [x] **Phase 2: UX Hardening** — Precise timestamp sorting, monthly dropdown filters, visual transfer indicators, clear filter CTA.
 - [ ] **Phase 3: Automated Syncing** — Integrate Plaid Link API for automatic credit and banking syncs.
-- [ ] **Phase 4: Subscriptions Tracker** — Automatic detection of recurring transactions with early payment warnings.
+- [x] **Phase 4: Subscriptions Tracker** — Automatic detection of recurring transactions with early payment warnings.
 - [ ] **Phase 5: Exports & Reports** — Add CSV/PDF statements compilation.
 
 ---

@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { Transaction, Category, TransactionType } from '@/types';
-import { formatCurrency, formatDate, formatTransactionDateTime } from '@/lib/utils/formatters';
+import { formatCurrency, formatTransactionDateTime } from '@/lib/utils/formatters';
 import { useTransactions } from '@/hooks/use-transactions';
 import { toast } from 'sonner';
 import { Trash2 } from 'lucide-react';

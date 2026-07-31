@@ -33,9 +33,12 @@ import type {
   DashboardStats,
   SpendingByCategory,
   MonthlyTrend,
+  RecurringTransaction,
 } from '@/types';
 
 // ─── Caching & Memoization ───────────────────────────────────────────────────
+
+import { AIContextCache } from '@/lib/cache/ai-cache';
 
 const ttlCache = new Map<string, { data: unknown; expiry: number }>();
 
@@ -45,6 +48,9 @@ export function invalidateUserCache(userId: string) {
       ttlCache.delete(key);
     }
   }
+  
+  // Also invalidate AI Session Context Cache to prevent hallucinations on stale data
+  AIContextCache.invalidate(userId);
 }
 
 async function withTtlCache<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise<T> {
@@ -653,6 +659,260 @@ export async function getMonthlyTrends(userId: string): Promise<MonthlyTrend[]> 
           net: Math.round(v.income - v.expenses),
         }));
       }
+    }
+  );
+}
+
+// ─── Recurring Transactions ──────────────────────────────────────────────────
+
+function mapRecurringTransaction(row: Record<string, unknown>): RecurringTransaction {
+  const categoryRow = row.category as Record<string, unknown> | null;
+
+  return {
+    id: row.id as string,
+    userId: row.user_id as string,
+    categoryId: (row.category_id as string) ?? null,
+    amount: safeNumber(row.amount),
+    currency: (row.currency as string) || 'USD',
+    type: row.type as Transaction['type'],
+    merchant: (row.merchant as string) ?? null,
+    description: (row.description as string) ?? null,
+    frequency: row.frequency as RecurringTransaction['frequency'],
+    startDate: row.start_date as string,
+    nextDate: row.next_date as string,
+    endDate: (row.end_date as string) ?? null,
+    lastProcessedAt: (row.last_processed_at as string) ?? null,
+    status: row.status as RecurringTransaction['status'],
+    category: categoryRow
+      ? {
+          id: categoryRow.id as string,
+          userId: (categoryRow.user_id as string) ?? null,
+          name: categoryRow.name as string,
+          icon: (categoryRow.icon as string) ?? null,
+          color: (categoryRow.color as string) ?? null,
+          isSystem: categoryRow.is_system as boolean,
+        }
+      : null,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
+export async function getRecurringTransactions(userId: string): Promise<RecurringTransaction[]> {
+  const supabase = await createClient();
+  return executeQuery(
+    () => supabase
+      .from('recurring_transactions')
+      .select('*, category:categories(*)')
+      .eq('user_id', userId)
+      .neq('status', 'archived')
+      .order('created_at', { ascending: false }),
+    {
+      functionName: 'db.getRecurringTransactions',
+      userId,
+      fallback: () => ([]),
+      mapFn: (data: Record<string, unknown>[]) => data.map(mapRecurringTransaction),
+    }
+  );
+}
+
+export async function getRecurringTransactionById(id: string, userId: string): Promise<RecurringTransaction | null> {
+  const supabase = await createClient();
+  return executeQuery(
+    () => supabase
+      .from('recurring_transactions')
+      .select('*, category:categories(*)')
+      .eq('id', id)
+      .eq('user_id', userId)
+      .single(),
+    {
+      functionName: 'db.getRecurringTransactionById',
+      userId,
+      fallback: () => null,
+      mapFn: (data: Record<string, unknown>) => mapRecurringTransaction(data),
+    }
+  );
+}
+
+export async function getDueRecurringTransactions(userId?: string): Promise<RecurringTransaction[]> {
+  // Use admin client to bypass RLS if running as a system cron job
+  const { createAdminClient } = await import('@/lib/supabase/server');
+  const supabase = createAdminClient();
+  
+  const today = new Date().toISOString().split('T')[0];
+  
+  return executeQuery(
+    () => {
+      let query = supabase
+        .from('recurring_transactions')
+        .select('*, category:categories(*)')
+        .eq('status', 'active')
+        .lte('next_date', today)
+        .order('next_date', { ascending: true });
+        
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+      
+      return query;
+    },
+    {
+      functionName: 'db.getDueRecurringTransactions',
+      fallback: () => ([]),
+      mapFn: (data: Record<string, unknown>[]) => data.map(mapRecurringTransaction),
+    }
+  );
+}
+
+export async function createRecurringTransactionRule(
+  userId: string,
+  input: {
+    amount: number;
+    currency: string;
+    type: string;
+    frequency: string;
+    startDate: string;
+    nextDate: string;
+    endDate?: string | null;
+    merchant?: string | null;
+    description?: string | null;
+    categoryId?: string | null;
+  }
+): Promise<RecurringTransaction | null> {
+  const supabase = await createClient();
+  return executeQuery(
+    () => supabase
+      .from('recurring_transactions')
+      .insert({
+        user_id: userId,
+        amount: input.amount,
+        currency: input.currency,
+        type: input.type,
+        frequency: input.frequency,
+        start_date: input.startDate,
+        next_date: input.nextDate,
+        end_date: input.endDate ?? null,
+        merchant: input.merchant ?? null,
+        description: input.description ?? null,
+        category_id: input.categoryId && input.categoryId !== '' ? input.categoryId : null,
+      })
+      .select('*, category:categories(*)')
+      .single(),
+    {
+      functionName: 'db.createRecurringTransactionRule',
+      userId,
+      isInsert: true,
+      fallback: () => null,
+      mapFn: (data: Record<string, unknown>) => mapRecurringTransaction(data),
+    }
+  );
+}
+
+export async function updateRecurringTransactionRule(
+  id: string,
+  userId: string,
+  input: Partial<{
+    amount: number;
+    currency: string;
+    type: string;
+    frequency: string;
+    startDate: string;
+    nextDate: string;
+    endDate: string | null;
+    merchant: string | null;
+    description: string | null;
+    categoryId: string | null;
+    status: string;
+  }>
+): Promise<RecurringTransaction | null> {
+  const supabase = await createClient();
+  
+  const updates: Record<string, unknown> = {
+    updated_at: new Date().toISOString()
+  };
+  
+  if (input.amount !== undefined) updates.amount = input.amount;
+  if (input.currency !== undefined) updates.currency = input.currency;
+  if (input.type !== undefined) updates.type = input.type;
+  if (input.frequency !== undefined) updates.frequency = input.frequency;
+  if (input.startDate !== undefined) updates.start_date = input.startDate;
+  if (input.nextDate !== undefined) updates.next_date = input.nextDate;
+  if (input.endDate !== undefined) updates.end_date = input.endDate;
+  if (input.merchant !== undefined) updates.merchant = input.merchant;
+  if (input.description !== undefined) updates.description = input.description;
+  if (input.categoryId !== undefined) updates.category_id = input.categoryId && input.categoryId !== '' ? input.categoryId : null;
+  if (input.status !== undefined) updates.status = input.status;
+
+  return executeQuery(
+    () => supabase
+      .from('recurring_transactions')
+      .update(updates)
+      .eq('id', id)
+      .eq('user_id', userId)
+      .select('*, category:categories(*)')
+      .single(),
+    {
+      functionName: 'db.updateRecurringTransactionRule',
+      userId,
+      fallback: () => null,
+      mapFn: (data: Record<string, unknown>) => mapRecurringTransaction(data),
+    }
+  );
+}
+
+export async function updateRecurringTransactionAdmin(
+  id: string,
+  updates: {
+    nextDate?: string;
+    lastProcessedAt?: string;
+    status?: string;
+  }
+): Promise<RecurringTransaction | null> {
+  const { createAdminClient } = await import('@/lib/supabase/server');
+  const supabase = createAdminClient();
+  
+  const payload: Record<string, unknown> = {
+    updated_at: new Date().toISOString()
+  };
+  
+  if (updates.nextDate !== undefined) payload.next_date = updates.nextDate;
+  if (updates.lastProcessedAt !== undefined) payload.last_processed_at = updates.lastProcessedAt;
+  if (updates.status !== undefined) payload.status = updates.status;
+
+  return executeQuery(
+    () => supabase
+      .from('recurring_transactions')
+      .update(payload)
+      .eq('id', id)
+      .select('*, category:categories(*)')
+      .single(),
+    {
+      functionName: 'db.updateRecurringTransactionAdmin',
+      fallback: () => null,
+      mapFn: (data: Record<string, unknown>) => mapRecurringTransaction(data),
+    }
+  );
+}
+
+export async function archiveRecurringTransactionRule(id: string, userId: string): Promise<boolean> {
+  const supabase = await createClient();
+  return executeQuery(
+    async () => {
+      const { error } = await supabase
+        .from('recurring_transactions')
+        .update({ status: 'archived', updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select()
+        .single();
+        
+      if (error) return { data: null, error: error };
+      return { data: true, error: null };
+    },
+    {
+      functionName: 'db.archiveRecurringTransactionRule',
+      userId,
+      fallback: () => false,
     }
   );
 }

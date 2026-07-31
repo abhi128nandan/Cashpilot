@@ -1,5 +1,5 @@
 import styles from './stats-cards.module.css';
-import { formatCurrency, formatPercent } from '@/lib/utils/formatters';
+import { formatCurrency } from '@/lib/utils/formatters';
 import type { DashboardStats } from '@/types';
 
 interface StatsCardsProps {
@@ -45,7 +45,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
   return (
     <div className={styles.grid} id="stats-cards">
       {cards.map((card, i) => {
-        const change = card.getChange(stats);
+        card.getChange(stats);
         return (
           <div
             key={card.key}

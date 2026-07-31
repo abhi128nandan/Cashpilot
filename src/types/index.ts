@@ -114,3 +114,27 @@ export interface DashboardStats {
 export type ActionResult<T = void> =
   | { success: true; data: T }
   | { success: false; error: string; fieldErrors?: Record<string, string[]> };
+
+// Recurring Transactions
+export type RecurringFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
+export type RecurringStatus = 'active' | 'paused' | 'archived';
+
+export interface RecurringTransaction {
+  id: string;
+  userId: string;
+  categoryId: string | null;
+  amount: number;
+  currency: string;
+  type: TransactionType;
+  merchant: string | null;
+  description: string | null;
+  frequency: RecurringFrequency;
+  startDate: string;
+  nextDate: string;
+  endDate: string | null;
+  lastProcessedAt: string | null;
+  status: RecurringStatus;
+  category?: Category | null;
+  createdAt: string;
+  updatedAt: string;
+}
