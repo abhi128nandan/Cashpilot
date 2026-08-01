@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Category, RecurringTransaction } from '@/types';
 import { useRecurringTransactions, useUpdateRecurringTransaction, useArchiveRecurringTransaction, useCreateRecurringTransaction } from '@/hooks/use-recurring';
@@ -11,7 +11,6 @@ import { RecurringTransactionForm } from '@/components/features/recurring/recurr
 import { ArchiveRecurringModal } from '@/components/features/recurring/archive-recurring-modal';
 import Skeleton from '@/components/ui/skeleton';
 import EmptyState from '@/components/ui/empty-state';
-import { AlertCircle } from '@/components/icons';
 import styles from './page.module.css';
 
 interface RecurringClientProps {
@@ -70,7 +69,7 @@ export default function RecurringClient({ categories }: RecurringClientProps) {
     return (
       <div className={styles.page}>
         <EmptyState 
-          icon={<AlertCircle size={48} />}
+          icon={<AlertCircle size={48} strokeWidth={1.5} />}
           title="Unable to load schedules" 
           description="There was a problem loading your recurring transactions."
         />
@@ -113,9 +112,18 @@ export default function RecurringClient({ categories }: RecurringClientProps) {
 
       {transactions.length === 0 ? (
         <EmptyState 
-          icon={<span style={{ fontSize: 48 }}>🔁</span>}
+          icon={<RefreshCw size={48} strokeWidth={1.5} />}
           title="No recurring transactions"
           description="Create your first schedule to automate your income or expenses."
+          action={
+            <button 
+              type="button" 
+              className={styles.createBtn}
+              onClick={() => setShowDialog(true)}
+            >
+              <Plus size={18} strokeWidth={2} /> New Schedule
+            </button>
+          }
         />
       ) : (
         <div className={styles.grid}>

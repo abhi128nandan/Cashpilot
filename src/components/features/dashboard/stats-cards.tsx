@@ -56,11 +56,25 @@ export default function StatsCards({ stats }: StatsCardsProps) {
               <span className={styles.cardLabel}>{card.label}</span>
               <span className={styles.cardIcon}>{card.icon}</span>
             </div>
-            <div className={styles.cardValue}>{card.getValue(stats)}</div>
-            <div
-              className={styles.cardGlow}
-              style={{ background: card.gradient }}
-            />
+            <div className={styles.cardValue}>
+              {stats.transactionCount === 0 ? (
+                <span className={styles.emptyValue}>No data yet</span>
+              ) : (
+                <>
+                  {card.getValue(stats)}
+                  {card.getChange(stats) !== null && (
+                    <span className={`${styles.trendIndicator} ${card.getChange(stats)! > 0 ? styles.trendUp : styles.trendDown}`}>
+                      {card.getChange(stats)! > 0 ? '↑' : '↓'} {Math.abs(card.getChange(stats)!)}% <span className={styles.trendLabel}>vs last month</span>
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+            {stats.transactionCount === 0 && (
+              <div className={styles.emptyHelper}>
+                Add a transaction to track
+              </div>
+            )}
           </div>
         );
       })}

@@ -83,6 +83,13 @@ export interface AIConversation {
   updatedAt: string;
 }
 
+export interface AIContext {
+  page: 'dashboard' | 'transactions' | 'budgets' | 'analytics' | 'chat';
+  stats?: DashboardStats;
+  recentTransactions?: Transaction[];
+  alerts?: Anomaly[];
+}
+
 // Analytics types
 export interface SpendingByCategory {
   categoryName: string;

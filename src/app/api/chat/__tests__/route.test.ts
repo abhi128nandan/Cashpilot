@@ -23,8 +23,8 @@ vi.mock('@/lib/cache/ai-cache', () => ({
   }
 }));
 
-vi.mock('@ai-sdk/openai', () => ({
-  openai: vi.fn().mockReturnValue('mock-model'),
+vi.mock('@ai-sdk/groq', () => ({
+  groq: vi.fn().mockReturnValue('mock-model'),
 }));
 
 vi.mock('ai', () => ({
@@ -107,7 +107,7 @@ describe('Chat API Route', () => {
     // Mock streamText to throw (e.g. rate limit error)
     const { streamText } = await import('ai');
     vi.mocked(streamText).mockImplementationOnce(() => {
-      throw new Error('OpenAI Rate Limit');
+      throw new Error('Groq Rate Limit');
     });
     
     const request = new Request('http://localhost/api/chat', {

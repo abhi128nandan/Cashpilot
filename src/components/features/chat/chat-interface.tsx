@@ -1,36 +1,25 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import styles from './chat-interface.module.css';
-
-const suggestedPrompts = [
-  'How much did I spend on dining this month?',
-  'What are my top 3 expense categories?',
-  'Am I on track with my budget?',
-  'Predict my expenses for next month',
-  'Find any unusual transactions',
-  'How can I save more this month?',
-];
-
-type ChatMessage = { id: string; role: 'user' | 'assistant'; content: string; };
+import { useState } from 'react';
+import type { AIMessage } from '@/types';
+import { ChatPresenter } from './chat-presenter';
 
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [localInput, setLocalInput] = useState('');
+  const [messages, setMessages] = useState<AIMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<unknown>(null);
   
   const sendMessage = async (message: string) => {
     if (!message.trim()) return;
 
-    const userMessage: ChatMessage = {
+    const userMessage: AIMessage = {
       id: `msg-${Date.now()}`,
       role: 'user',
       content: message,
+      createdAt: new Date().toISOString(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setLocalInput('');
     setIsLoading(true);
     setError(null);
 
@@ -56,6 +45,7 @@ export default function ChatInterface() {
             id: `msg-${Date.now() + 1}`,
             role: 'assistant',
             content: errorData || 'Something went wrong while generating response.',
+            createdAt: new Date().toISOString(),
           },
         ]);
 
@@ -75,6 +65,7 @@ export default function ChatInterface() {
           id: assistantMessageId,
           role: 'assistant',
           content: '',
+          createdAt: new Date().toISOString(),
         },
       ]);
 
@@ -85,25 +76,12 @@ export default function ChatInterface() {
         
         const chunk = decoder.decode(value, { stream: true });
         
-        // Vercel AI SDK toTextStreamResponse streams out strings prefixed with '0:'
-        // For simplicity, we can do a naive parse.
-        const lines = chunk.split('\n');
-        for (const line of lines) {
-          if (line.startsWith('0:')) {
-            try {
-              const text = JSON.parse(line.slice(2));
-              fullContent += text;
-              
-              setMessages((prev) => prev.map(msg => 
-                msg.id === assistantMessageId 
-                  ? { ...msg, content: fullContent }
-                  : msg
-              ));
-            } catch {
-              // Ignore parse errors for partial chunks
-            }
-          }
-        }
+        fullContent += chunk;
+        setMessages((prev) => prev.map(msg => 
+          msg.id === assistantMessageId 
+            ? { ...msg, content: fullContent }
+            : msg
+        ));
       }
     } catch (error: unknown) {
       console.error(error);
@@ -114,6 +92,7 @@ export default function ChatInterface() {
           id: `msg-${Date.now() + 1}`,
           role: 'assistant',
           content: 'Something went wrong while generating response.',
+          createdAt: new Date().toISOString(),
         },
       ]);
     } finally {
@@ -121,132 +100,12 @@ export default function ChatInterface() {
     }
   };
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (localInput?.trim() && !isLoading) {
-        e.currentTarget.form?.requestSubmit();
-      }
-    }
-  };
-
   return (
-    <div className={styles.container} id="chat-page">
-      {messages.length === 0 ? (
-        <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🤖</div>
-          <h2 className={styles.emptyTitle}>CashPilot AI</h2>
-          <p className={styles.emptyDesc}>
-            Ask me anything about your finances. I can analyze spending patterns,
-            track budgets, detect anomalies, and forecast cash flow.
-          </p>
-          <div className={styles.promptGrid}>
-            {suggestedPrompts.map((prompt) => (
-              <button
-                key={prompt}
-                className={styles.promptChip}
-                onClick={() => setLocalInput(prompt)}
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className={styles.messageList}>
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`${styles.message} ${
-                msg.role === 'user' ? styles.messageUser : styles.messageAssistant
-              }`}
-            >
-              <div className={styles.messageAvatar}>
-                {msg.role === 'user' ? 'AM' : '🤖'}
-              </div>
-              <div className={styles.messageBubble}>
-                <div className={styles.messageContent}>
-                  {msg.content.split('\n').map((line: string, i: number) => (
-                    <p key={i}>{line || <br />}</p>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-          {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
-            <div className={`${styles.message} ${styles.messageAssistant}`}>
-              <div className={styles.messageAvatar}>🤖</div>
-              <div className={styles.messageBubble}>
-                <div className={styles.typingDots}>
-                  <span />
-                  <span />
-                  <span />
-                </div>
-              </div>
-            </div>
-          )}
-          {error !== null && (
-            <div className={`${styles.message} ${styles.messageAssistant}`}>
-              <div className={styles.messageAvatar}>⚠️</div>
-              <div className={styles.messageBubble}>
-                <div className={styles.messageContent}>
-                  <p style={{ color: 'var(--color-danger-400)' }}>
-                    AI insights temporarily unavailable. Please try again later.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-      )}
-
-      <form 
-        className={styles.inputArea} 
-        onSubmit={(e) => {
-          e.preventDefault();
-          sendMessage(localInput);
-        }}
-      >
-        <div className={styles.inputWrapper}>
-          <textarea
-            ref={inputRef}
-            value={localInput}
-            onChange={(e) => setLocalInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask about your finances..."
-            className={styles.textInput}
-            rows={1}
-            id="chat-input"
-          />
-          <button
-            type="submit"
-            disabled={!localInput?.trim() || isLoading}
-            className={styles.sendBtn}
-            id="chat-send"
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path
-                d="M16.5 1.5L8.25 9.75M16.5 1.5L11.25 16.5L8.25 9.75M16.5 1.5L1.5 6.75L8.25 9.75"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
-        <p className={styles.disclaimer}>
-          CashPilot AI provides insights based on your data. Always verify financial decisions independently.
-        </p>
-      </form>
-    </div>
+    <ChatPresenter
+      messages={messages}
+      isLoading={isLoading}
+      error={error}
+      onSendMessage={sendMessage}
+    />
   );
 }
