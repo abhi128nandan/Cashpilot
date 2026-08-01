@@ -1,24 +1,119 @@
 .wrapper {
   display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 100dvh;
-  padding: var(--space-6);
+  width: 100%;
+  background: var(--color-bg-primary);
+}
+
+.leftPanel {
+  flex: 0 0 45%;
+  max-width: 45%;
+  background: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border-subtle);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-12);
   overflow: hidden;
 }
 
-.glow {
+/* Subtle background texture/grid for the left panel */
+.leftPanel::before {
+  content: '';
   position: absolute;
-  top: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 700px;
-  height: 500px;
-  background: radial-gradient(
-    ellipse,
-    hsla(225, 82%, 52%, 0.1) 0%,
-    transparent 70%
-  );
-  pointer-events: none;
+  inset: 0;
+  background-image: radial-gradient(var(--color-border-subtle) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.leftContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.valueProps {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.valueProps h1 {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: var(--tracking-tight);
+  margin-bottom: var(--space-4);
+  line-height: 1.1;
+}
+
+.valueProps p {
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+  max-width: 90%;
+  line-height: 1.5;
+}
+
+.propList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.propList li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.checkIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: hsla(225, 82%, 52%, 0.1);
+  color: var(--color-primary-400);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.footer {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+
+.rightPanel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: var(--color-bg-primary);
+}
+
+@media (max-width: 1024px) {
+  .leftPanel {
+    display: none;
+  }
 }

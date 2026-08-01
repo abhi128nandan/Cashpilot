@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth/use-auth';
 import { useEffect, useState, useRef } from 'react';
+import { Search, Bell } from 'lucide-react';
 import styles from './header.module.css';
 
 const pageTitles: Record<string, string> = {
@@ -77,21 +78,7 @@ export default function Header() {
 
       <div className={styles.right}>
         <div className={styles.searchContainer}>
-          <svg
-            className={styles.searchIcon}
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-          >
-            <path
-              d="M7.333 12.667A5.333 5.333 0 107.333 2a5.333 5.333 0 000 10.667zM14 14l-2.9-2.9"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <Search size={16} strokeWidth={2} className={styles.searchIcon} />
           <input
             ref={inputRef}
             type="text"
@@ -105,15 +92,7 @@ export default function Header() {
         </div>
 
         <button className={styles.iconButton} id="notifications-btn" aria-label="Notifications">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path
-              d="M13.5 6a4.5 4.5 0 10-9 0c0 5.25-2.25 6.75-2.25 6.75h13.5S13.5 11.25 13.5 6zM10.295 15.75a1.5 1.5 0 01-2.59 0"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <Bell size={18} strokeWidth={2} />
           <span className={styles.notifDot} />
         </button>
       </div>

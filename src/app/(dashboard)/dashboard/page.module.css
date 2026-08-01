@@ -4,37 +4,121 @@
   gap: var(--space-6);
 }
 
-.chartsRow {
+.onboardingPanel {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  animation: scaleIn var(--duration-normal) var(--ease-out);
+}
+
+.onboardingHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.onboardingTitle {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.onboardingDesc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.onboardingSteps {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.onboardingStep {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.onboardingStep:hover {
+  border-color: var(--color-border-default);
+  background: var(--color-bg-hover);
+  transform: translateY(-1px);
+}
+
+.stepIcon {
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.onboardingStep:hover .stepIcon {
+  color: var(--color-primary-400);
+}
+
+.stepInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stepTitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.stepDesc {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
   gap: var(--space-6);
 }
 
-.chartMain {
+.col4 {
+  grid-column: span 4;
   min-width: 0;
 }
 
-.chartSide {
+.col6 {
+  grid-column: span 6;
   min-width: 0;
 }
 
-.bottomRow {
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: var(--space-6);
-}
-
-.transactionsCol {
+.col8 {
+  grid-column: span 8;
   min-width: 0;
 }
 
-.alertsCol {
+.col12 {
+  grid-column: span 12;
   min-width: 0;
 }
 
 @media (max-width: 1024px) {
-  .chartsRow,
-  .bottomRow {
+  .dashboardGrid {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .onboardingSteps {
     grid-template-columns: 1fr;
+  }
+
+  #dash-ai {
+    order: -1;
   }
 }

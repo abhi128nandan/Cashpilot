@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { loginSchema } from '@/lib/validators/auth';
 import styles from './page.module.css';
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   // Stable ref — prevents createClient() being called on every render.
   const supabaseRef = useRef(createClient());
   const supabase = supabaseRef.current;
@@ -112,15 +114,26 @@ export default function LoginPage() {
           <label htmlFor="password" className={styles.label}>
             Password
           </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            placeholder="••••••••"
-            className={styles.input}
-          />
+          <div className={styles.inputWrapper}>
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              required
+              placeholder="••••••••"
+              className={styles.input}
+            />
+            <button
+              type="button"
+              className={styles.passwordToggle}
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label="Toggle password visibility"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
           {fieldErrors.password && (
             <span className={styles.fieldError}>{fieldErrors.password[0]}</span>
           )}

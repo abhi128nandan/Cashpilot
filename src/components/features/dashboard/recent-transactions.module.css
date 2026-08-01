@@ -1,11 +1,18 @@
 .card {
-  background: var(--color-bg-secondary);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%), var(--color-bg-secondary);
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-xl);
+  border-radius: 16px;
   padding: var(--space-6);
   animation: fadeInUp var(--duration-normal) var(--ease-out);
   animation-delay: 200ms;
   animation-fill-mode: both;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.card:hover {
+  border-color: var(--color-border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.2);
 }
 
 .cardHeader {
@@ -41,7 +48,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-4) var(--space-2);
   border-radius: var(--radius-md);
   transition: background var(--duration-fast) var(--ease-out);
 }
@@ -90,6 +97,22 @@
 .meta {
   font-size: var(--text-xs);
   color: var(--color-text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.metaBadge {
+  background: hsla(280, 70%, 55%, 0.15);
+  color: hsl(280, 70%, 75%);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .amount {
@@ -105,4 +128,44 @@
 
 .amountExpense {
   color: var(--color-text-primary);
+}
+
+.emptyRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+  background: var(--color-bg-secondary);
+  border: 1px dashed var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  text-align: center;
+  gap: var(--space-2);
+}
+
+.emptyIcon {
+  font-size: var(--text-2xl);
+  margin-bottom: var(--space-1);
+}
+
+.emptyText {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-2);
+}
+
+.emptyCta {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.emptyCta:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
 }

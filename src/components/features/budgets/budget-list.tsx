@@ -4,7 +4,9 @@ import { useState } from 'react';
 import type { Budget, Category } from '@/types';
 import { formatCurrency } from '@/lib/utils/formatters';
 import { safePercentage } from '@/lib/math';
+import { Target, Plus } from 'lucide-react';
 import BudgetForm from './budget-form';
+import EmptyState from '@/components/ui/empty-state';
 import styles from './budget-list.module.css';
 
 interface BudgetListProps {
@@ -41,8 +43,35 @@ export default function BudgetList({ budgets, categories }: BudgetListProps) {
         </div>
       </div>
 
-      {/* Budget cards */}
-      <div className={styles.grid}>
+      {budgets.length === 0 ? (
+        <div style={{ marginTop: 'var(--space-8)' }}>
+          <EmptyState
+            icon={<Target size={48} strokeWidth={1.5} />}
+            title="No budgets set up"
+            description="Create your first budget to start tracking your spending limits."
+            action={
+              <button 
+                onClick={() => setShowForm(true)}
+                style={{
+                  background: 'var(--color-primary-500)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Plus size={18} strokeWidth={2} /> Create Budget
+              </button>
+            }
+          />
+        </div>
+      ) : (
+        <div className={styles.grid}>
         {budgets.map((budget, i) => {
           const pct = Math.min(safePercentage(budget.spentAmount, budget.limitAmount), 100);
           const remaining = budget.limitAmount - budget.spentAmount;
@@ -97,6 +126,7 @@ export default function BudgetList({ budgets, categories }: BudgetListProps) {
           <span className={styles.addLabel}>Add Budget</span>
         </button>
       </div>
+      )}
 
       {showForm && (
         <BudgetForm categories={categories} onClose={() => setShowForm(false)} />

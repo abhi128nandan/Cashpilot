@@ -1,0 +1,386 @@
+.container {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--duration-normal) var(--ease-out);
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+}
+
+.header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerTitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-primary);
+}
+
+.headerIcon {
+  font-size: 1.1rem;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.closeBtn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+}
+
+/* Collapsed State */
+.collapsedBody {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1;
+  justify-content: center;
+}
+
+.greeting {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.greetingSub {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.insightsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-2) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insightItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+}
+
+.insightBullet {
+  color: var(--color-primary-400);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.expandBtn {
+  margin-top: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-primary);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.expandBtn:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+}
+
+/* Expanded State */
+.expandedBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.messageList {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.message {
+  display: flex;
+  gap: var(--space-3);
+  animation: fadeInUp 0.3s var(--ease-out);
+}
+
+.messageUser {
+  flex-direction: row-reverse;
+}
+
+.messageAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.messageBubble {
+  background: var(--color-bg-secondary);
+  padding: var(--space-3) var(--space-4);
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  max-width: 80%;
+}
+
+.messageUser .messageBubble {
+  background: var(--color-primary-500);
+  color: white;
+}
+
+.messageAssistant .messageBubble {
+  border: 1px solid var(--color-border-subtle);
+}
+
+.msgSectionHeader {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-2);
+  letter-spacing: var(--tracking-tight);
+}
+
+.msgSectionHeader:first-child {
+  margin-top: 0;
+}
+
+.msgListItem {
+  margin-left: var(--space-2);
+  margin-bottom: var(--space-1);
+  padding-left: var(--space-2);
+  position: relative;
+}
+
+.msgListItem::before {
+  content: "•";
+  position: absolute;
+  left: -8px;
+  color: var(--color-primary-400);
+}
+
+.msgHighlightCard {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-default);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  margin: var(--space-3) 0;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.msgSpacer {
+  height: var(--space-3);
+}
+
+.suggestedPrompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.promptChip {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-default);
+  border-radius: 14px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 150ms var(--ease-out);
+}
+
+.promptChip:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-hover);
+}
+
+.inputArea {
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-primary);
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px;
+  padding: var(--space-1);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.inputWrapper:focus-within {
+  border-color: var(--color-primary-400);
+  background: var(--color-bg-primary);
+}
+
+.textInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  resize: none;
+  min-height: 24px;
+  max-height: 120px;
+}
+
+.textInput:focus {
+  outline: none;
+}
+
+.sendBtn {
+  background: var(--color-primary-500);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: var(--space-1);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.sendBtn:disabled {
+  background: var(--color-bg-hover);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+}
+
+.typingDots {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+}
+
+.typingDots span {
+  width: 6px;
+  height: 6px;
+  background: var(--color-text-tertiary);
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typingDots span:nth-child(1) { animation-delay: -0.32s; }
+.typingDots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* Markdown Styles */
+.markdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  word-break: break-word;
+}
+.markdown p {
+  margin: 0;
+}
+.markdown pre {
+  background: var(--color-bg-primary);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 13px;
+  border: 1px solid var(--color-border-subtle);
+}
+.markdown code {
+  background: var(--color-bg-tertiary);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+.markdown pre code {
+  background: transparent;
+  padding: 0;
+}
+.markdown ul, .markdown ol {
+  margin: 0;
+  padding-left: var(--space-4);
+}
+.markdown li {
+  margin-bottom: var(--space-1);
+}
+.markdown h3, .markdown h4 {
+  margin: var(--space-2) 0 var(--space-1) 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.messageUser .markdown code, .messageUser .markdown pre {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.retryBtn {
+  margin-top: var(--space-2);
+  background: transparent;
+  border: 1px solid var(--color-danger-400);
+  color: var(--color-danger-400);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+.retryBtn:hover {
+  background: var(--color-danger-400);
+  color: white;
+}

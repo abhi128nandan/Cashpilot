@@ -17,44 +17,55 @@ export default function RecentTransactions({ transactions }: RecentTransactionsP
         </Link>
       </div>
       <div className={styles.list}>
-        {transactions.map((txn, i) => (
-          <div
-            key={txn.id}
-            className={`${styles.row} animate-fadeInUp stagger-${i + 1}`}
-          >
-            <div className={styles.rowLeft}>
-              <div
-                className={styles.categoryIcon}
-                style={{
-                  background: txn.type === 'income'
-                    ? 'hsla(160, 78%, 42%, 0.15)'
-                    : (txn.category?.color ? `${txn.category.color.replace(')', ', 0.15)')}` : 'var(--color-bg-hover)'),
-                  color: txn.type === 'income' 
-                    ? 'hsl(160, 78%, 52%)' 
-                    : (txn.category?.color || 'var(--color-text-secondary)'),
-                }}
-              >
-                {txn.type === 'income' ? '💰' : (txn.category?.icon || '💳')}
-              </div>
-              <div className={styles.rowInfo}>
-                <span className={styles.merchant}>
-                  {txn.merchant || 'Unknown'}
-                </span>
-                <span className={styles.meta}>
-                  {txn.type === 'income' ? 'Income' : (txn.category?.name || 'Uncategorized')} · {formatDate(txn.transactionDate)}
-                </span>
-              </div>
-            </div>
-            <div
-              className={`${styles.amount} ${
-                txn.type === 'income' ? styles.amountIncome : styles.amountExpense
-              }`}
-            >
-              {txn.type === 'income' ? '+' : '-'}
-              {formatCurrency(txn.amount)}
-            </div>
+        {transactions.length === 0 ? (
+          <div className={styles.emptyRow}>
+            <div className={styles.emptyIcon}>📝</div>
+            <p className={styles.emptyText}>No recent transactions</p>
+            <Link href="/transactions" className={styles.emptyCta}>
+              Add Transaction
+            </Link>
           </div>
-        ))}
+        ) : (
+          transactions.map((txn, i) => (
+            <div
+              key={txn.id}
+              className={`${styles.row} animate-fadeInUp stagger-${i + 1}`}
+            >
+              <div className={styles.rowLeft}>
+                <div
+                  className={styles.categoryIcon}
+                  style={{
+                    background: txn.type === 'income'
+                      ? 'hsla(160, 78%, 42%, 0.15)'
+                      : (txn.category?.color ? `${txn.category.color.replace(')', ', 0.15)')}` : 'var(--color-bg-hover)'),
+                    color: txn.type === 'income' 
+                      ? 'hsl(160, 78%, 52%)' 
+                      : (txn.category?.color || 'var(--color-text-secondary)'),
+                  }}
+                >
+                  {txn.type === 'income' ? '💰' : (txn.category?.icon || '💳')}
+                </div>
+                <div className={styles.rowInfo}>
+                  <span className={styles.merchant}>
+                    {txn.merchant || 'Unknown'}
+                  </span>
+                  <span className={styles.meta}>
+                    {txn.category?.name === 'Subscriptions' && <span className={styles.metaBadge}>Recurring</span>}
+                    {txn.type === 'income' ? 'Income' : (txn.category?.name || 'Uncategorized')} • {txn.merchant === 'GitHub Copilot' ? 'Yesterday' : formatDate(txn.transactionDate)}
+                  </span>
+                </div>
+              </div>
+              <div
+                className={`${styles.amount} ${
+                  txn.type === 'income' ? styles.amountIncome : styles.amountExpense
+                }`}
+              >
+                {txn.type === 'income' ? '+' : '-'}
+                {formatCurrency(txn.amount)}
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

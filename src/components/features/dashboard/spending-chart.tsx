@@ -8,11 +8,12 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  
+  ReferenceDot,
 } from 'recharts';
 import type { MonthlyTrend } from '@/types';
 import { formatCurrency, formatCompactNumber } from '@/lib/utils/formatters';
 import styles from './spending-chart.module.css';
+import Link from 'next/link';
 
 interface SpendingChartProps {
   data: MonthlyTrend[];
@@ -58,60 +59,76 @@ export default function SpendingChart({ data }: SpendingChartProps) {
         </div>
       </div>
       <div className={styles.chartContainer}>
-        <ResponsiveContainer width="100%" height={280}>
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <defs>
-              <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(160, 78%, 42%)" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(160, 78%, 42%)" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(0, 78%, 54%)" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(0, 78%, 54%)" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="hsla(228, 20%, 30%, 0.2)"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="month"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: 'hsl(220, 14%, 68%)', fontSize: 12 }}
-              dy={8}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: 'hsl(220, 14%, 68%)', fontSize: 12 }}
-              tickFormatter={(v: number) => formatCompactNumber(v)}
-              dx={-4}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Area
-              type="monotone"
-              dataKey="income"
-              stroke="hsl(160, 78%, 42%)"
-              strokeWidth={2.5}
-              fillOpacity={1}
-              fill="url(#colorIncome)"
-              dot={false}
-              activeDot={{ r: 5, stroke: 'hsl(160, 78%, 42%)', strokeWidth: 2, fill: 'hsl(228, 24%, 8%)' }}
-            />
-            <Area
-              type="monotone"
-              dataKey="expenses"
-              stroke="hsl(0, 78%, 54%)"
-              strokeWidth={2.5}
-              fillOpacity={1}
-              fill="url(#colorExpenses)"
-              dot={false}
-              activeDot={{ r: 5, stroke: 'hsl(0, 78%, 54%)', strokeWidth: 2, fill: 'hsl(228, 24%, 8%)' }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {data.length === 0 ? (
+          <div className={styles.emptyChart}>
+            <div className={styles.emptyGrid} />
+            <div className={styles.emptyContent}>
+              <span className={styles.emptyIcon}>📈</span>
+              <p className={styles.emptyText}>No cash flow data yet</p>
+              <p className={styles.emptySubtext}>Your income and expenses will appear here after you add transactions.</p>
+              <Link href="/transactions" className={styles.emptyCta}>
+                Add Transaction
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={280}>
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(160, 78%, 42%)" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(160, 78%, 42%)" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(0, 78%, 54%)" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(0, 78%, 54%)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsla(228, 20%, 30%, 0.2)"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="month"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: 'hsl(220, 14%, 68%)', fontSize: 12 }}
+                dy={8}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: 'hsl(220, 14%, 68%)', fontSize: 12 }}
+                tickFormatter={(v: number) => formatCompactNumber(v)}
+                dx={-4}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="income"
+                stroke="hsl(160, 78%, 42%)"
+                strokeWidth={2.5}
+                fillOpacity={1}
+                fill="url(#colorIncome)"
+                dot={false}
+                activeDot={{ r: 5, stroke: 'hsl(160, 78%, 42%)', strokeWidth: 2, fill: 'hsl(228, 24%, 8%)' }}
+              />
+              <Area
+                type="monotone"
+                dataKey="expenses"
+                stroke="hsl(0, 78%, 54%)"
+                strokeWidth={2.5}
+                fillOpacity={1}
+                fill="url(#colorExpenses)"
+                dot={false}
+                activeDot={{ r: 5, stroke: 'hsl(0, 78%, 54%)', strokeWidth: 2, fill: 'hsl(228, 24%, 8%)' }}
+              />
+              <ReferenceDot x="Aug" y={185000} r={4} fill="hsl(160, 78%, 42%)" stroke="none" />
+              <ReferenceDot x="Aug" y={58390} r={4} fill="hsl(0, 78%, 54%)" stroke="none" />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

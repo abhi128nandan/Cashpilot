@@ -6,8 +6,9 @@ import type { Transaction, Category, TransactionType } from '@/types';
 import { formatCurrency, formatTransactionDateTime } from '@/lib/utils/formatters';
 import { useTransactions } from '@/hooks/use-transactions';
 import { toast } from 'sonner';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Search } from 'lucide-react';
 import TransactionForm from './transaction-form';
+import EmptyState from '@/components/ui/empty-state';
 import DeleteTransactionModal from './delete-transaction-modal';
 import styles from './transaction-list.module.css';
 
@@ -356,22 +357,22 @@ export default function TransactionList({
           </tbody>
         </table>
         {filtered.length === 0 && (
-          <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>🔍</div>
-            <h4 className={styles.emptyTitle}>No transactions found</h4>
-            <p className={styles.emptyDesc}>
-              We couldn&apos;t find any transactions matching your current filters. Try adjusting your search query or dropdown selections.
-            </p>
-            {isFiltered && (
-              <button
-                onClick={handleClearFilters}
-                className={styles.emptyResetBtn}
-                id="reset-filters-empty"
-              >
-                Reset All Filters
-              </button>
-            )}
-          </div>
+          <EmptyState
+            icon={<Search size={48} strokeWidth={1.5} />}
+            title="No transactions found"
+            description="We couldn't find any transactions matching your current filters. Try adjusting your search query or dropdown selections."
+            action={
+              isFiltered ? (
+                <button
+                  onClick={handleClearFilters}
+                  className={styles.emptyResetBtn}
+                  id="reset-filters-empty"
+                >
+                  Reset All Filters
+                </button>
+              ) : undefined
+            }
+          />
         )}
       </div>
       
