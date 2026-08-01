@@ -1,5 +1,5 @@
 import { streamText } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { groq } from '@ai-sdk/groq';
 import { NextResponse } from 'next/server';
 import { gatherAIContext } from '@/services/ai-context.service';
 import { PromptBuilder } from '@/lib/ai/prompt-builder';
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     let user;
     try {
       user = await requireAuth();
-    } catch (e: unknown) {
+    } catch {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -44,19 +44,19 @@ export async function POST(req: Request) {
 
     try {
       const result = streamText({
-        model: openai('gpt-4o-mini'),
+        model: groq('llama-3.1-8b-instant'),
         messages,
         system: systemPrompt,
       });
 
       return result.toTextStreamResponse();
     } catch (aiError) {
-      logger.error('ai', 'OpenAI API Generation Error', { 
+      logger.error('ai', 'Groq API Generation Error', { 
         userId: aiContext.user.id, 
         error: aiError instanceof Error ? aiError.message : String(aiError) 
       });
       // Return a graceful fallback that won't crash the client-side parser
-      return new NextResponse('0:"I am having trouble connecting to the AI provider right now. Please try again later."\n', { 
+      return new NextResponse('I am having trouble connecting to the AI provider right now. Please try again later.', { 
         status: 200, 
         headers: { 'Content-Type': 'text/plain; charset=utf-8' }
       });

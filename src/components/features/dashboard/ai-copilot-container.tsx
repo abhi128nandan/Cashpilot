@@ -1,10 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import type { AIMessage } from '@/types';
-import { ChatPresenter } from './chat-presenter';
+import type { AIMessage, AIContext } from '@/types';
+import { AICopilotPresenter } from './ai-copilot-presenter';
 
-export default function ChatInterface() {
+export interface AICopilotContainerProps {
+  context: AIContext;
+  userName?: string;
+}
+
+export function AICopilotContainer({ context, userName }: AICopilotContainerProps) {
   const [messages, setMessages] = useState<AIMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<unknown>(null);
@@ -33,6 +38,8 @@ export default function ChatInterface() {
         },
         body: JSON.stringify({
           messages: updatedMessages,
+          // Passing context to the backend (for future integration)
+          context, 
         }),
       });
 
@@ -53,7 +60,6 @@ export default function ChatInterface() {
         return;
       }
 
-      // Read the stream
       if (!response.body) throw new Error('No body in response');
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -100,12 +106,52 @@ export default function ChatInterface() {
     }
   };
 
+  // Generate dynamic insights based on context
+  let insights = [
+    "You're on track for your savings goal.",
+    "Food spending is stable.",
+  ];
+  
+  if (context.page === 'dashboard' && context.stats) {
+    insights = [
+      `Your net balance is ₹${context.stats.netBalance.toLocaleString()}`,
+      `Your savings rate is ${context.stats.savingsRate}%`,
+      `Your top category is ${context.stats.topCategory}`,
+    ];
+  }
+
+  // Generate context-aware suggestions
+  let suggestedPrompts = [
+    'Why did I spend more this month?',
+    'Can I afford a ₹1.4L MacBook?',
+    'Predict next month expenses.',
+    'Explain this chart.',
+  ];
+
+  if (context.page === 'transactions') {
+    suggestedPrompts = [
+      'Show unusual transactions.',
+      'Categorize my recent spending.',
+      'Find my subscriptions.',
+    ];
+  } else if (context.page === 'budgets') {
+    suggestedPrompts = [
+      'Which budgets am I overspending on?',
+      'How much should I save?',
+      'Recommend new budget limits.',
+    ];
+  }
+
   return (
-    <ChatPresenter
+    <AICopilotPresenter
+      context={context}
       messages={messages}
       isLoading={isLoading}
       error={error}
       onSendMessage={sendMessage}
+      suggestedPrompts={suggestedPrompts}
+      insights={insights}
+      userName={userName}
     />
   );
 }

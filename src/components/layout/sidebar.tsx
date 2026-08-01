@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -8,27 +8,35 @@ import { useAuth } from '@/lib/auth/use-auth';
 import { createClient } from '@/lib/supabase/client';
 import styles from './sidebar.module.css';
 
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { href: '/transactions', label: 'Transactions', icon: '💳' },
-  { href: '/budgets', label: 'Budgets', icon: '🎯' },
-  { href: '/recurring', label: 'Recurring', icon: '🔁' },
-  { href: '/analytics', label: 'Analytics', icon: '📈' },
+const mainItems = [
+  { href: '#search', label: 'Search', icon: '🔍' },
+  { href: '/dashboard', label: 'Home', icon: '🏠' },
+  { href: '/chat', label: 'AI Copilot', icon: '✨', badge: 'New' },
 ];
 
-const bottomItems = [
-  { href: '/settings', label: 'Settings', icon: '⚙️' },
+const workspaceItems = [
+  { href: '/transactions', label: 'Transactions', icon: '💳', hasChevron: true },
+  { href: '/budgets', label: 'Budgets', icon: '🎯', hasChevron: true },
+  { href: '/recurring', label: 'Recurring', icon: '🔁' },
+  { href: '/analytics', label: 'Analytics', icon: '📈' },
+  { href: '/members', label: 'Team', icon: '👥', badge: '12', hasChevron: true },
+];
+
+const devItems = [
+  { href: '#api-keys', label: 'API Keys', icon: '>_' },
+  { href: '#webhooks', label: 'Webhooks', icon: '🔌' },
 ];
 
 export default function Sidebar() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
-  // Stable ref — supabase client should not be recreated on every render.
+  
   const supabaseRef = useRef(createClient());
   const supabase = supabaseRef.current;
-  // Derive initials from user metadata
-  const fullName = (user?.user_metadata?.full_name as string) ?? 'User';
+  
+  const fullName = (user?.user_metadata?.full_name as string) ?? 'CashPilot User';
   const initials = fullName
     .split(' ')
     .map((n) => n[0])
@@ -41,84 +49,87 @@ export default function Sidebar() {
     router.push('/');
   }
 
+  const renderNavLink = (item: any) => {
+    const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+    return (
+      <li key={item.label}>
+        <Link
+          href={item.href}
+          className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
+          id={`nav-${item.label.toLowerCase().replace(/\s/g, '-')}`}
+        >
+          <span className={styles.navIcon}>{item.icon}</span>
+          <span className={styles.navLabel}>{item.label}</span>
+          {item.badge && (
+            <span className={`${styles.navBadge} ${isActive ? styles.navBadgeActive : ''}`}>
+              {item.badge}
+            </span>
+          )}
+          {item.hasChevron && (
+            <svg className={styles.navChevron} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          )}
+        </Link>
+      </li>
+    );
+  };
+
   return (
-    <aside className={styles.sidebar} id="main-sidebar">
-      <div className={styles.logo}>
-        <div className={styles.logoIcon}>
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <rect width="28" height="28" rx="8" fill="url(#logo-gradient)" />
-            <path
-              d="M8 14L12 18L20 10"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <defs>
-              <linearGradient id="logo-gradient" x1="0" y1="0" x2="28" y2="28">
-                <stop stopColor="hsl(225, 82%, 52%)" />
-                <stop offset="1" stopColor="hsl(260, 70%, 55%)" />
-              </linearGradient>
-            </defs>
-          </svg>
+    <aside className={`${styles.sidebar} ${isCollapsed ? styles.sidebarCollapsed : ''}`} id="main-sidebar" data-collapsed={isCollapsed ? "true" : "false"}>
+      
+      <div className={styles.logo} onClick={() => setIsCollapsed(!isCollapsed)}>
+        <div className={styles.logoIconBox}>
+          <span className={styles.logoIconLetter}>{initials[0] || 'C'}</span>
         </div>
-        <span className={styles.logoText}>CashPilot</span>
+        <div className={styles.logoTextContainer}>
+          <span className={styles.logoText}>{fullName}</span>
+          <span className={styles.logoSubtext}>Pro Plan</span>
+        </div>
+        <svg className={styles.logoChevron} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
       </div>
 
       <nav className={styles.nav}>
         <ul className={styles.navList}>
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
-                  id={`nav-${item.label.toLowerCase().replace(/\s/g, '-')}`}
-                >
-                  <span className={styles.navIcon}>{item.icon}</span>
-                  <span className={styles.navLabel}>{item.label}</span>
-                  {isActive && <div className={styles.activeIndicator} />}
-                </Link>
-              </li>
-            );
-          })}
+          {mainItems.map(renderNavLink)}
+        </ul>
+
+        <div className={styles.sectionTitle}>WORKSPACE</div>
+        <ul className={styles.navList}>
+          {workspaceItems.map(renderNavLink)}
+        </ul>
+
+        <div className={styles.sectionTitle}>DEVELOPERS</div>
+        <ul className={styles.navList}>
+          {devItems.map(renderNavLink)}
         </ul>
       </nav>
 
       <div className={styles.bottomSection}>
-        {bottomItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
-              id={`nav-${item.label.toLowerCase()}`}
-            >
-              <span className={styles.navIcon}>{item.icon}</span>
-              <span className={styles.navLabel}>{item.label}</span>
-            </Link>
-          );
-        })}
+        <div className={styles.separator} />
+        
+        <Link href="/settings" className={styles.navLink}>
+          <span className={styles.navIcon}>⚙️</span>
+          <span className={styles.navLabel}>Settings</span>
+        </Link>
 
-        {/* Sign out button */}
         <button
           type="button"
           onClick={handleSignOut}
           className={styles.navLink}
           id="sign-out-btn"
         >
-          <span className={styles.navIcon}>🚪</span>
-          <span className={styles.navLabel}>Sign Out</span>
+          <span className={styles.navIcon}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </span>
+          <span className={styles.navLabel}>Log out</span>
         </button>
-
-        <div className={styles.userCard}>
-          <div className={styles.userAvatar}>{initials}</div>
-          <div className={styles.userInfo}>
-            <span className={styles.userName}>{fullName}</span>
-          </div>
-        </div>
       </div>
     </aside>
   );

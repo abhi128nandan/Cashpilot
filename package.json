@@ -16,12 +16,12 @@
     "clean": "node -e \"const fs=require('fs');fs.rmSync('.next',{recursive:true,force:true});console.log('Cleaned .next')\""
   },
   "dependencies": {
-    "@ai-sdk/openai": "^3.0.65",
+    "@ai-sdk/groq": "^4.0.19",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.103.3",
     "@tanstack/react-query": "^5.100.14",
     "@tanstack/react-query-devtools": "^5.100.14",
-    "ai": "^6.0.191",
+    "ai": "^7.0.47",
     "date-fns": "^4.1.0",
     "lucide-react": "^1.16.0",
     "next": "^16.2.10",
@@ -32,14 +32,18 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19",
     "@vitejs/plugin-react": "^6.0.5",
     "@vitest/ui": "^4.1.10",
+    "autoprefixer": "^10.5.4",
     "eslint": "^9",
     "eslint-config-next": "^16.2.10",
     "jsdom": "^29.1.1",
+    "postcss": "^8.5.25",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5",
     "vitest": "^4.1.10"
   }

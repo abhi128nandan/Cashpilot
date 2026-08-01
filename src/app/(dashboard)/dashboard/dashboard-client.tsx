@@ -8,8 +8,9 @@ import AnomalyAlerts from '@/components/features/dashboard/anomaly-alerts';
 import { useAnalytics } from '@/hooks/use-analytics';
 import Skeleton from '@/components/ui/skeleton';
 import EmptyState from '@/components/ui/empty-state';
-import { AlertCircle } from '@/components/icons';
+import { AlertCircle, CheckCircle } from '@/components/icons';
 import styles from './page.module.css';
+import Link from 'next/link';
 
 export default function DashboardClient() {
   const { data, isLoading, isError } = useAnalytics();
@@ -23,9 +24,13 @@ export default function DashboardClient() {
           <Skeleton className={styles.card} style={{ height: '140px' }} />
           <Skeleton className={styles.card} style={{ height: '140px' }} />
         </div>
-        <div className={styles.chartsRow}>
-          <Skeleton className={styles.chartMain} style={{ height: '400px' }} />
-          <Skeleton className={styles.chartSide} style={{ height: '400px' }} />
+        <div className={styles.dashboardGrid}>
+          <div className={styles.col8}>
+            <Skeleton className={styles.chartMain} style={{ height: '400px' }} />
+          </div>
+          <div className={styles.col4}>
+            <Skeleton className={styles.chartSide} style={{ height: '400px' }} />
+          </div>
         </div>
       </div>
     );
@@ -45,26 +50,56 @@ export default function DashboardClient() {
 
   return (
     <div className={styles.page} id="dashboard-page">
+      {data.stats.transactionCount === 0 && (
+        <div className={styles.onboardingPanel}>
+          <div className={styles.onboardingHeader}>
+            <h2 className={styles.onboardingTitle}>Welcome to CashPilot 👋</h2>
+            <p className={styles.onboardingDesc}>You are all set! Follow these quick steps to get started with your financial tracking.</p>
+          </div>
+          <div className={styles.onboardingSteps}>
+            <Link href="/transactions" className={styles.onboardingStep}>
+              <CheckCircle size={20} className={styles.stepIcon} />
+              <div className={styles.stepInfo}>
+                <span className={styles.stepTitle}>Add your first transaction</span>
+                <span className={styles.stepDesc}>Record your first income or expense</span>
+              </div>
+            </Link>
+            <Link href="/budgets" className={styles.onboardingStep}>
+              <CheckCircle size={20} className={styles.stepIcon} />
+              <div className={styles.stepInfo}>
+                <span className={styles.stepTitle}>Create a budget</span>
+                <span className={styles.stepDesc}>Set spending limits for your categories</span>
+              </div>
+            </Link>
+            <Link href="/recurring" className={styles.onboardingStep}>
+              <CheckCircle size={20} className={styles.stepIcon} />
+              <div className={styles.stepInfo}>
+                <span className={styles.stepTitle}>Configure recurring payments</span>
+                <span className={styles.stepDesc}>Track your subscriptions and bills</span>
+              </div>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Stats cards row */}
       <StatsCards stats={data.stats} />
 
-      {/* Charts row */}
-      <div className={styles.chartsRow}>
-        <div className={styles.chartMain}>
+      {/* 12-Column Layout */}
+      <div className={styles.dashboardGrid}>
+        <div className={styles.col12} id="dash-cashflow">
           <SpendingChart data={data.monthlyTrends} />
         </div>
-        <div className={styles.chartSide}>
+
+        <div className={styles.col6}>
           <CategoryBreakdown data={data.spendingByCategory} />
         </div>
-      </div>
-
-      {/* Bottom row */}
-      <div className={styles.bottomRow}>
-        <div className={styles.transactionsCol}>
-          <RecentTransactions transactions={data.recentTransactions} />
-        </div>
-        <div className={styles.alertsCol}>
+        <div className={styles.col6}>
           <AnomalyAlerts anomalies={data.anomalies} />
+        </div>
+
+        <div className={styles.col12}>
+          <RecentTransactions transactions={data.recentTransactions} />
         </div>
       </div>
     </div>

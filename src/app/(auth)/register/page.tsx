@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { registerSchema } from '@/lib/validators/auth';
 import styles from './page.module.css';
@@ -12,6 +13,8 @@ export default function RegisterPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   // Stable ref — createBrowserClient is a singleton, but this makes the
   // instantiation explicit and consistent with use-auth.ts.
   const supabaseRef = useRef(createClient());
@@ -181,15 +184,26 @@ export default function RegisterPage() {
 
         <div className={styles.field}>
           <label htmlFor="password" className={styles.label}>Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            placeholder="••••••••"
-            className={styles.input}
-          />
+          <div className={styles.inputWrapper}>
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="new-password"
+              required
+              placeholder="••••••••"
+              className={styles.input}
+            />
+            <button
+              type="button"
+              className={styles.passwordToggle}
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label="Toggle password visibility"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
           {fieldErrors.password && (
             <span className={styles.fieldError}>{fieldErrors.password[0]}</span>
           )}
@@ -197,15 +211,26 @@ export default function RegisterPage() {
 
         <div className={styles.field}>
           <label htmlFor="confirmPassword" className={styles.label}>Confirm Password</label>
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            required
-            placeholder="••••••••"
-            className={styles.input}
-          />
+          <div className={styles.inputWrapper}>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              autoComplete="new-password"
+              required
+              placeholder="••••••••"
+              className={styles.input}
+            />
+            <button
+              type="button"
+              className={styles.passwordToggle}
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              aria-label="Toggle confirm password visibility"
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
           {fieldErrors.confirmPassword && (
             <span className={styles.fieldError}>{fieldErrors.confirmPassword[0]}</span>
           )}
