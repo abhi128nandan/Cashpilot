@@ -1,8 +1,19 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useAnalytics } from '@/hooks/use-analytics';
-import { AICopilotContainer } from '@/components/features/dashboard/ai-copilot-container';
+import Skeleton from '@/components/ui/skeleton';
 import styles from './page.module.css';
+
+const AICopilotContainer = dynamic(
+  () => import('@/components/features/dashboard/ai-copilot-container').then(m => m.AICopilotContainer),
+  {
+    ssr: false,
+    loading: () => (
+      <Skeleton style={{ height: '500px', width: '100%', borderRadius: '16px' }} />
+    ),
+  }
+);
 
 export default function ChatClient({ userName }: { userName: string }) {
   const { data } = useAnalytics();

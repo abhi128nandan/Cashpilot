@@ -3,7 +3,11 @@ import { Toaster } from 'sonner';
 import Providers from '@/components/providers/query-provider';
 import './globals.css';
 import { Inter } from 'next/font/google';
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   title: {
